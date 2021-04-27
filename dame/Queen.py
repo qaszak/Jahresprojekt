@@ -4,7 +4,7 @@ class Queen:
     __player = -1
 
     def __init__(self, x, y, player):
-        self.setPosition(self, x, y)
+        self.set_position(x, y)
         self.__player = player
 
     def set_position(self, x, y):
@@ -12,4 +12,7 @@ class Queen:
         self.__y = y
 
     def get_y_direction(self):
-        return 1 if self.__player == 1 else -1
+        return -1 if self.__player == 1 else 1
+
+    def get_player(self):
+        return self.__player
