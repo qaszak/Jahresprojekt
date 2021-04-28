@@ -1,0 +1,112 @@
+Board
+
+- 6x6 tiles
+- start: place a piece on every black tile in the first two rows of each side
+
+-------------------------
+|   | b |   | b |   | b |
+-------------------------
+| b |   | b |   | b |   |
+-------------------------
+|   |   |   |   |   |   |
+-------------------------
+|   |   |   |   |   |   |
+-------------------------
+|   | w |   | w |   | w |
+-------------------------
+| w |   | w |   | w |   |
+-------------------------
+
+b = black piece
+w = white piece
+
+
+
+--------
+MOVEMENT
+--------
+
+
+   WITHOUT HITTING ENEMY PIECE
+   - piece can move one tile diagonally towards the opponents baseline
+     ----------------
+     |    | b  |    |
+     ----------------
+     | b1 |    | b2 |    
+     ----------------
+     |    |    |    |
+     ----------------
+     | w1 |    | w2 |
+     ----------------
+     |    | w  |    |
+     ----------------
+     piece b can move to b1 or b2
+     piece w can move to w1 or w2
+
+
+   HITTING ENEMY PIECE
+   - piece can hit an enemy piece by jumping diagonally to the neighbouring tile which must not be occupied by another piece
+      - piece is forced to make a possible hit 
+      - hitting of opposing pieces gets iterated until no further hit is possible in current turn
+     ---------------------                                      ---------------------
+     |    |    |    |    |                                      | w1 |    |    |    |          
+     ---------------------   legal: w1 hits b1                  ---------------------
+     |    | b1 |    |    |  -------------------------------->   |    |    |    |    |
+     ---------------------                                      ---------------------
+     |    |    | w1 |    |                                      |    |    |    |    |
+     ---------------------                                      ---------------------
+               |
+               |  illegal: w1 is forced to hit b1
+               V
+     ---------------------
+     |    |    |    |    |
+     --------------------- 
+     |    | b1 |    | w1 |  
+     ---------------------
+     |    |    |     |   |
+     ---------------------                              
+
+
+     --------------------------                    --------------------------                    --------------------------
+     |    |    |    |    |    |                    |    |    |    |    |    |                    |    |    | w1 |    |    |
+     --------------------------                    --------------------------                    --------------------------
+     |    | b2 |    |    |    |                    |    | b2 |    |    |    |                    |    |    |    |    |    |
+     --------------------------    w1 hits b1      --------------------------    w1 hits b2      --------------------------
+     |    |    |    |    |    |  ------------->    | w1 |    |    |    |    |  -------------->   |    |    |    |    |    |
+     --------------------------    turn continues  --------------------------    turn ends       --------------------------
+     |    | b1 |    |    |    |                    |    |    |    |    |    |                    |    |    |    |    |    |
+     --------------------------                    --------------------------                    --------------------------
+     |    |    | w1 |    |    |                    |    |    |    |    |    |                    |    |    |    |    |    |
+     --------------------------                    --------------------------                    --------------------------
+
+
+   BLOCKED MOVEMENT
+   - movement can be blocked by:
+      - piece of same team
+      - piece of enemy team that can not be hit
+      - board border
+     ----------------------
+     |    |    |    | b1 |
+     ---------------------
+     |    |    | b2 |    |
+     ---------------------
+     |    | w2 |    |    |
+     ---------------------
+     | w1 |    |    |    |
+     ---------------------
+     piece w1 is blocked by w2 and the board border
+     piece w2 is blocked by b2 which it can not hit because of b1. w2 can move to the left
+
+
+     WIN CONDITION
+     - piece on opponents baseline
+     or
+     - opponent loses
+
+
+     LOSE CONDITION
+     - all pieces are hit
+     or
+     - no movement possible
+
+
