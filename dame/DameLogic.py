@@ -2,7 +2,7 @@ import DameBoard
 import Queen
 import Move
 
-class GameLogic:
+class DameLogic:
 
     __board = None
     __move = None

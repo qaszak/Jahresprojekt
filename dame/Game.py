@@ -1,5 +1,5 @@
 import DameBoard
-import GameLogic
+import DameLogic
 import Move
 
 class Game:
@@ -10,7 +10,7 @@ class Game:
 
     def __init__(self, board_size):
         self.__internal_board = DameBoard.DameBoard(board_size)
-        self.game_logic = GameLogic.GameLogic()
+        self.game_logic = DameLogic.DameLogic()
         self.__player_turn = 2
 
 ################################# NEW ##################################
