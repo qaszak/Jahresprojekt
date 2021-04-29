@@ -23,6 +23,11 @@ class DameBoard:
         return len(self.__board)
 
 
+    def remove_queen(self, queen):
+        self.set_tile(queen.get_row(), queen.get_column(), None)
+        self.__queens.remove(queen)
+
+
     def get_queens_for_player(self, player):
         output = []
         for queen in self.__queens:
