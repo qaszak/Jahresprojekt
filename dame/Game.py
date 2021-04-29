@@ -56,6 +56,9 @@ class Game:
             execution = True
         return execution
 
+    def get_winner(self):
+        return self.game_logic.get_winner()
+
 
 
     def __get_selected_move(self, destination_row, destination_column):

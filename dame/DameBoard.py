@@ -28,7 +28,7 @@ class DameBoard:
         self.__queens.remove(queen)
 
 
-    def get_queens_for_player(self, player):
+    def get_queens_for(self, player):
         output = []
         for queen in self.__queens:
             if queen.get_player() == player:

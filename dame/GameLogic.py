@@ -3,9 +3,6 @@ import Queen
 import Move
 
 class GameLogic:
-    # ToDos:
-    # - implement as a singleton
-    # - implement methods
 
     __board = None
     __move = None
@@ -24,7 +21,7 @@ class GameLogic:
         return self.__move.get_queen().get_player() == player
 
 
-    # new
+
     def get_possible_moves_for(self, player, queen, board):
         moves = []
         for move in self.__get_potential_moves_for(queen):
@@ -33,7 +30,64 @@ class GameLogic:
                 moves.append(move)
         return moves
 
-    # new
+
+    def is_hitting_move(self):
+        return self.get_hit_queen() is not None
+
+
+    def get_hit_queen(self):
+        hit_queen = None
+        distance_rows = self.__move.get_row() - self.__move.get_queen().get_row()
+        distance_columns = self.__move.get_column() - self.__move.get_queen().get_column()
+        if distance_rows in [-2, 2] and distance_columns in [-2, 2]:
+            hit_row = (1 if distance_rows == 2 else - 1) + self.__move.get_queen().get_row()
+            hit_column = (1 if distance_columns == 2 else -1) + self.__move.get_queen().get_column()
+            hit_queen = self.__board.get_tile(hit_row, hit_column)
+            if (hit_queen is None) or (hit_queen.get_player() == self.__move.get_queen().get_player()):
+                hit_queen = None
+        return hit_queen
+
+
+    def get_winner(self):
+        winner = -1
+        if self.__is_player_on_opponents_baseline(1) or \
+           self.__is_player_out_of_queens(2) or \
+           self.__is_player_out_of_moves(2):
+                winner = 1
+        elif self.__is_player_on_opponents_baseline(2) or \
+             self.__is_player_out_of_queens(1) or \
+             self.__is_player_out_of_moves(1):
+                winner = 2
+        return winner
+
+
+    def __is_player_on_opponents_baseline(self, player):
+        result = False
+        for queen in self.__board.get_queens_for(player):
+            if queen.get_row() == self.__get_opponents_baseline_index(player):
+                result = True
+                break
+        return result
+
+
+    def __is_player_out_of_queens(self, player):
+        return len(self.__board.get_queens_for(player)) == 0
+
+
+    def __is_player_out_of_moves(self, player):
+        moves = []
+        for queen in self.__board.get_queens_for(player):
+            moves += self.get_possible_moves_for(player, queen, self.__board)
+        return len(moves) == 0
+
+
+    def __get_opponents_baseline_index(self, player):
+        return 0 if player == 2 else self.__board.get_size() - 1
+
+
+
+    # private Methods
+
     def __get_potential_moves_for(self, queen):
         moves = []
         prefixes = [-1, 1]
@@ -44,7 +98,7 @@ class GameLogic:
                     moves.append(move)
         return moves
 
-    # new
+
     def __is_move_valid(self, player):
         return self.is_players_turn(player) and \
                self.__is_move_in_board() and \
@@ -84,27 +138,11 @@ class GameLogic:
         content_destination_tile = self.__board.get_tile(self.__move.get_row(), self.__move.get_column())
         return content_destination_tile is not None
 
-    # new
+
     def __is_standard_move(self):
         distance_columns = self.__move.get_column() - self.__move.get_queen().get_column()
         return distance_columns in [-1, 1]
 
-    # new
-    def is_hitting_move(self):
-        return self.get_hit_queen() is not None
-
-    # new
-    def get_hit_queen(self):
-        hit_queen = None
-        distance_rows = self.__move.get_row() - self.__move.get_queen().get_row()
-        distance_columns = self.__move.get_column() - self.__move.get_queen().get_column()
-        if distance_rows in [-2, 2] and distance_columns in [-2, 2]:
-            hit_row = (1 if distance_rows == 2 else - 1) + self.__move.get_queen().get_row()
-            hit_column = (1 if distance_columns == 2 else -1) + self.__move.get_queen().get_column()
-            hit_queen = self.__board.get_tile(hit_row, hit_column)
-            if (hit_queen is None) or (hit_queen.get_player() == self.__move.get_queen().get_player()):
-                hit_queen = None
-        return hit_queen
 
 
 ###################### FUNCTIONS FOR TESTCASES.PY (UNCOMMENT TO RUN TESTCASES) ####################################
