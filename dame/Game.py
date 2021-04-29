@@ -13,7 +13,7 @@ class Game:
         self.__player_turn = 2
 
     def start(self, board_size):
-        pass
+        print()
 
     def move_queen_to(self, current_row, current_column, destination_row, destination_column):
         move = self.__create_move_object(current_row, current_column, destination_row, destination_column)
