@@ -16,8 +16,8 @@ class GameLogic:
         self.__move = move
 
 
-    def is_queen_selected(self):
-        return not(self.__move.get_queen() is None)
+    def is_queen_at(self, board, row, column):
+        return board.get_tile(row, column) is not None
 
 
     def is_players_turn(self, player):
@@ -25,13 +25,12 @@ class GameLogic:
 
 
     # new
-    def get_possible_moves_for(self, queen, board):
+    def get_possible_moves_for(self, player, queen, board):
         moves = []
         for move in self.__get_potential_moves_for(queen):
             self.set_move(board, move)
-            if self.__is_move_valid():
+            if self.__is_move_valid(player):
                 moves.append(move)
-        print(moves) # testing
         return moves
 
     # new
@@ -43,12 +42,12 @@ class GameLogic:
                 for step in [1, 2]:
                     move = Move.Move(queen, queen.get_row() + prefix_1 * step, queen.get_column() + prefix_2 * step)
                     moves.append(move)
-        print(moves) # testing
         return moves
 
     # new
-    def __is_move_valid(self):
-        return self.__is_move_in_board() and \
+    def __is_move_valid(self, player):
+        return self.is_players_turn(player) and \
+               self.__is_move_in_board() and \
                self.__is_direction_valid() and \
                not self.__is_move_blocked_by_queen() and \
                (self.__is_standard_move() or self.is_hitting_move())
@@ -62,7 +61,7 @@ class GameLogic:
 
 
     def __is_direction_valid(self):
-        return self.__is_row_direction_valid(self) and self.__is_column_direction_valid(self)
+        return self.__is_row_direction_valid() and self.__is_column_direction_valid()
 
 
     def __is_row_direction_valid(self):
@@ -103,6 +102,8 @@ class GameLogic:
             hit_row = (1 if distance_rows == 2 else - 1) + self.__move.get_queen().get_row()
             hit_column = (1 if distance_columns == 2 else -1) + self.__move.get_queen().get_column()
             hit_queen = self.__board.get_tile(hit_row, hit_column)
+            if (hit_queen is None) or (hit_queen.get_player() == self.__move.get_queen().get_player()):
+                hit_queen = None
         return hit_queen
 
 
