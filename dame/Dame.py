@@ -2,7 +2,7 @@ import DameBoard
 import DameLogic
 import Move
 
-class Game:
+class Dame:
     __internal_board = None
     game_logic = None
     __player_turn = -1

@@ -1,4 +1,4 @@
-import Game
+import Dame
 
 game = None
 
@@ -7,7 +7,7 @@ print("-- Welcome to Dame --\nn: new game\nq: quit")
 while True:
     command = input("(n) new game or (q) quit : ")
     if command == "n":
-        game = Game.Game(6)
+        game = Dame.Dame(6)
         game.print_board()
         print()
 
