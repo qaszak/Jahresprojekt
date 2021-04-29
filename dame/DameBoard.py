@@ -7,8 +7,8 @@ class DameBoard:
 
     def __init__(self, board_size):
         self.__initialize_empty_board(board_size)
-        self.__place_queens_for_player(board_size, 1)
-        self.__place_queens_for_player(board_size, 2)
+        self.__place_queens_for_player(1)
+        self.__place_queens_for_player(2)
 
 
     def set_tile(self, row, column, value):
@@ -17,6 +17,15 @@ class DameBoard:
 
     def get_tile(self, row, column):
         return self.__board[column][row]
+
+
+    def get_size(self):
+        return len(self.__board)
+
+
+    def remove_queen(self, queen):
+        self.set_tile(queen.get_row(), queen.get_column(), None)
+        self.__queens.remove(queen)
 
 
     def get_queens_for_player(self, player):
@@ -29,9 +38,9 @@ class DameBoard:
 
     # Temporary method for testing purposes
     def print(self):
-        for row in range(0, len(self.__board)):
+        for row in range(0, self.get_size()):
             row_output = ""
-            for column in range(0, len(self.__board)):
+            for column in range(0, self.get_size()):
                 current_tile = self.get_tile(row, column)
                 row_output += ("X" if current_tile is None else ("B" if current_tile.get_player() == 1 else "W")) + "   "
             print(row_output)
@@ -41,12 +50,12 @@ class DameBoard:
         self.__board = [[None for columns in range(board_size)] for rows in range(board_size)]
 
 
-    def __place_queens_for_player(self, board_size, player):
+    def __place_queens_for_player(self, player):
         step = 2
         start_column = 1
-        row_range = range(0, 2) if player == 1 else range(board_size - 2, board_size)
+        row_range = range(0, 2) if player == 1 else range(self.get_size() - 2, self.get_size())
         for row in row_range:
-            for column in range(start_column, board_size, step):
+            for column in range(start_column, self.get_size(), step):
                 queen = Queen.Queen(row, column, player)
                 self.set_tile(row, column, queen)
                 self.__queens.append(queen)
