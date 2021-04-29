@@ -31,6 +31,10 @@ while True:
                     if command_3 == "u":
                         break
                     elif command_3 == "m":
+                        winner = game.get_winner()
+                        if winner != -1:
+                            print("Player " + str(winner) + " wins")
+                            quit()
                         queen_row = int(input("\t\tmove to row: "))
                         queen_column = int(input("\t\tmove to column: "))
                         if game.execute_move(queen_row, queen_column):
