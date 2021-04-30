@@ -1,3 +1,5 @@
+"""
+
 import Game
 
 game = Game.Game(6)
@@ -199,3 +201,4 @@ game.move_queen_to(4, 1, 2, 3)
 result = logic.is_standard_move()
 print_testcase("1.3.5.4 GameLogic.is_standard_move -> move more than one tile to the right (non-hitting)", result, False)
 
+"""
