@@ -8,6 +8,7 @@ class InternalDameBoard:
     __queens = []
     __score = 0
     __player_turn = -1
+    __in_turn_previously_moved_queen = None
 
     def __init__(self, board, player_first_move):
         self.__board = board
@@ -43,6 +44,10 @@ class InternalDameBoard:
         return self.__player_turn
 
 
+    def get_in_turn_previously_moved_queen(self):
+        return self.__in_turn_previously_moved_queen
+
+
     def get_queens_for(self, player):
         output = []
         for queen in self.__queens:
@@ -66,6 +71,14 @@ class InternalDameBoard:
         self.__set_tile(queen.get_row(), queen.get_column(), None)
         self.__set_tile(move.get_row(), move.get_column(), queen)
         queen.set_position(move.get_row(), move.get_column())
+
+
+    def update_turn(self, move):
+        self.__in_turn_previously_moved_queen = move.get_queen()
+
+
+    def close_turn(self):
+        self.__in_turn_previously_moved_queen = None
 
 
     def remove_queen(self, queen):
