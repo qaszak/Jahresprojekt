@@ -13,11 +13,16 @@ class MovementLogic:
 
 
     #public methods
-    def get_possible_moves_for(self, queen):
+    def get_moves_for(self, queen, check_possible_in_turn = True):
         moves = []
-        for move in self.__get_potential_moves_for(queen):
-            if self.__is_move_valid(move):
-                moves.append(move)
+        if not check_possible_in_turn:
+            moves = self.__get_possible_moves_for(queen)
+        elif self.__is_new_turn() or self.__is_already_moved_in_turn(queen):
+            hitting_moves = self.__get_hitting_moves_for_player(queen)
+            if self.__is_already_moved_in_turn(queen) or len(hitting_moves) > 0:
+                moves = self.__select_hitting_moves_for_queen_from(hitting_moves, queen)
+            else:
+                moves = self.__get_possible_moves_for(queen)
         return moves
 
 
@@ -34,7 +39,39 @@ class MovementLogic:
         return hit_queen
 
 
-    # private helper methods
+    # private methods
+    def __is_already_moved_in_turn(self, queen):
+        return self.__board.get_in_turn_previously_moved_queen() == queen
+
+
+    def __is_new_turn(self):
+        return self.__board.get_in_turn_previously_moved_queen() is None
+
+
+    def __get_hitting_moves_for_player(self, queen):
+        hitting_moves = []
+        for queen in self.__board.get_queens_for(queen.get_player()):
+            for move in self.__get_possible_moves_for(queen):
+                if self.__is_hitting_move(move):
+                    hitting_moves.append(move)
+        return hitting_moves
+
+
+    def __select_hitting_moves_for_queen_from(self, hitting_moves, queen):
+        moves = []
+        for move in hitting_moves:
+            if move.get_queen() == queen:
+                moves.append(move)
+        return moves
+
+
+    def __get_possible_moves_for(self, queen):
+        moves = []
+        for move in self.__get_potential_moves_for(queen):
+            if self.__is_move_valid(move):
+                moves.append(move)
+        return moves
+
 
     def __get_potential_moves_for(self, queen):
         moves = []
@@ -90,3 +127,37 @@ class MovementLogic:
 
     def __calculate_column_distance(self, move):
         return move.get_column() - move.get_queen().get_column()
+
+
+
+    ################### UNCOMMENT TO RUN TESTCASES.PY ###################
+
+    """
+    
+    
+    def calculate_row_distance(self, move):
+        return self.__calculate_row_distance(move)
+
+    def calculate_column_distance(self, move):
+        return self.__calculate_column_distance(move)
+
+    def is_hitting_move(self, move):
+        return self.__is_hitting_move(move)
+
+    def is_non_hitting_move(self, move):
+        return self.__is_non_hitting_move(move)
+
+    def is_move_blocked_by_queen(self, move):
+        return self.__is_move_blocked_by_queen(move)
+
+    def is_row_direction_valid(self, move):
+        return self.__is_row_direction_valid(move)
+
+    def is_move_in_board(self, move):
+        return self.__is_move_in_board(move)
+
+    def is_move_valid(self, move):
+        return self.__is_move_valid(move)
+    
+    
+    """

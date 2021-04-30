@@ -25,9 +25,10 @@ class AdapterPrint:
 
 
     def __format_board(self, board):
+        board_range = range(0, len(board))
         output = "-------------------------\n"
-        for row in range(0, len(board)):
-            for column in range(0, len(board)):
-                output += ("| " + str(board[column][row]) + " ")
+        for row in board_range:
+            for column in board_range:
+                output += ("| " + str(board[row][column]) + " ")
             output += "|\n-------------------------\n"
         return output

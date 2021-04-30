@@ -18,12 +18,11 @@ class WinLogic:
         if self.__is_player_on_opponents_baseline(self.__ai_player) or \
            self.__is_player_out_of_queens(self.__human_player) or \
            self.__is_player_out_of_moves(self.__human_player):
-            winner = self.__ai_player
-
-        if self.__is_player_on_opponents_baseline(self.__human_player) or \
-           self.__is_player_out_of_queens(self.__ai_player) or \
-           self.__is_player_out_of_moves(self.__ai_player):
-            winner = self.__human_player
+                winner = self.__ai_player
+        elif self.__is_player_on_opponents_baseline(self.__human_player) or \
+             self.__is_player_out_of_queens(self.__ai_player) or \
+             self.__is_player_out_of_moves(self.__ai_player):
+                winner = self.__human_player
 
         return winner
 
@@ -55,3 +54,22 @@ class WinLogic:
                 result = False
                 break
         return result
+
+
+
+    ################### UNCOMMENT TO RUN TESTCASES.PY #######################
+
+    """"
+    
+    
+    def is_player_on_opponents_baseline(self, player):
+        return self.__is_player_on_opponents_baseline(player)
+
+    def is_player_out_of_queens(self, player):
+        return self.__is_player_out_of_queens(player)
+
+    def is_player_out_of_moves(self, player):
+        return self.__is_player_out_of_moves(player)
+        
+        
+    """
