@@ -1,4 +1,5 @@
 class Move:
+
     __queen = None
     __to_row = -1
     __to_column = -1
