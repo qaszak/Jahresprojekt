@@ -2,7 +2,7 @@ import Queen
 import Move
 import ExternalDameBoard
 
-class DameBoard:
+class InternalDameBoard:
 
     __board = [[]]
     __queens = []
@@ -19,7 +19,7 @@ class DameBoard:
         self.__board[column][row] = value
 
 
-    def __set_player_turn(self, player):
+    def set_player_turn(self, player):
         self.__player_turn = player
 
 
