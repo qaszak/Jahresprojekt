@@ -1,12 +1,9 @@
-##############                    #################
-#######      JAHRESPROJEKT GROUP 3       ##########
-##############                    #################
 from random import choice
 from tkinter import *
 
-class Board:
 
-    def __init__(self, master, spiel, player_pawns_position, KI_pawns_position):
+class Bauernschach():
+    def __init__(self, can, B_W, B_S, rand):
         # the highlighted square
         self.highlighted_square = []
         # the last played move player
@@ -19,53 +16,54 @@ class Board:
         # last possible moves
         self.last_possible_moves = [[-1, -1]]
 
+        self.can = can
+        self.BOARD_WIDTH = B_W
+        self.BOARD_SIZE = B_S
+        self.rand = rand
+        self.spiel = "bauernschach"
+        self.last_selected = [0, 0]
+        size = 6
         # player and ki pawns position [column , line]
-        self.player_pawns_position = player_pawns_position
-        self.KI_pawns_position = KI_pawns_position
-        ###  CHANGE SIZE OF THE BOARD AND THE WIDTH OF THE CASES HERE ###
-        ###################
-        self.spiel = spiel  ### which game bauernschach,dame, tic-tac-toe?
-        self.BOARD_SIZE = 6  #
-        self.BOARD_WIDTH = 80  #
-        self.PAGE_WIDTH = 500  #
-        self.PAGE_HEIGHT = 500  #
-        self.COLOR1 = 'grey'  #
-        self.COLOR2 = 'white'  #
-        self.rand = 0  ####
-        self.turn = 0
-        ###################
-        self.x1, self.y1, self.x2, self.y2 = self.rand, self.rand, self.BOARD_WIDTH + self.rand, \
-                                             self.BOARD_WIDTH + self.rand
-        self.color = self.COLOR1
-        self.can = Canvas(master, width=self.PAGE_WIDTH, heigh=self.PAGE_HEIGHT, bg='ivory')
-        b1 = Button(master, text='Create Game', command=self.board)
-        if self.spiel == "bauernschach":
-            b2 = Button(master, text='start Bauernschach ', command=self.fill_board_pawns)
-            b2.pack(side=RIGHT, padx=3, pady=3)
-        if self.spiel == "dame":
-            b3 = Button(master, text='start dame ', command=self.fill_board_queen)
-            b3.pack(side=RIGHT, padx=3, pady=3)
-        b1.pack(side=RIGHT, padx=3, pady=3)
-        b4 = Button(master, text='back', command=self.back)
-        b4.pack(side=RIGHT, padx=3, pady=3)
-        self.can.pack(side=TOP, padx=5, pady=5)
+        # player_pawns_position = [[0, 5], [1, 5], [2, 5], [3, 5], [4, 5], [5, 5]]
+        # KI_pawns_position = [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0]]
+        self.player_pawns_position = []
+        self.KI_pawns_position = []
+        for i in range(size):
+            self.player_pawns_position.append([i, size - 1])
+            self.KI_pawns_position.append([i, 0])
+        print("bauernschach init")
 
-        master.mainloop()
+    # draw the pawns on the KI side
+    def fill_board_KI_pawns(self):
+        ite, self.x3, self.x4, self.y3, self.y4 = 0, self.BOARD_WIDTH / 5, self.BOARD_WIDTH / 5, self.BOARD_WIDTH - \
+                                                  self.BOARD_WIDTH / 5, self.BOARD_WIDTH - self.BOARD_WIDTH / 5
+        while ite < self.BOARD_SIZE:
+            self.can.create_rectangle(self.x3 + self.rand, self.x4 + self.rand, self.y3 + self.rand,
+                                      self.y4 + self.rand, fill='yellow')
+            ite, self.x3, self.x4, self.y3, self.y4 = ite + 1, self.x3 + self.BOARD_WIDTH, self.x4, self.y3 + \
+                                                      self.BOARD_WIDTH, self.y4
 
-    # create an empty board
-    def board(self):
-        ite, i = 0, 1
+        # draw the pawns on the player side
 
-        while self.x1 < self.BOARD_WIDTH * self.BOARD_SIZE and self.y1 < self.BOARD_WIDTH * self.BOARD_SIZE:
-            self.can.create_rectangle(self.x1, self.y1, self.x2, self.y2, fill=self.color)
-            i, ite, self.x1, self.x2 = i + 1, ite + 1, self.x1 + self.BOARD_WIDTH, self.x2 + self.BOARD_WIDTH
-            if ite == self.BOARD_SIZE:
-                self.y1, self.y2 = self.y1 + self.BOARD_WIDTH, self.y2 + self.BOARD_WIDTH
-                i, ite, self.x1, self.x2 = i + 1, 0, self.rand, self.BOARD_WIDTH + self.rand
-            if i % 2 == 0:
-                self.color = self.COLOR2
-            else:
-                self.color = self.COLOR1
+    def fill_board_player_pawns(self):
+        ite, self.x3, self.x4, self.y3, self.y4 = 0, self.BOARD_WIDTH / 5 + self.rand, self.BOARD_WIDTH * (
+                self.BOARD_SIZE - 1) + self.BOARD_WIDTH / 5 + self.rand, \
+                                                  self.BOARD_WIDTH - self.BOARD_WIDTH / 5 + self.rand, \
+                                                  self.BOARD_WIDTH * self.BOARD_SIZE - self.BOARD_WIDTH / 5 + self.rand
+
+        while ite < self.BOARD_SIZE:
+            obj1 = self.can.create_oval(self.x3, self.x4, self.y3, self.y4, fill='red')
+            if self.spiel == "bauernschach":
+                self.can.tag_bind(obj1, "<Button-1>", self.show_possible_moves_bauernschach)
+            ite, self.x3, self.x4, self.y3, self.y4 = ite + 1, self.x3 + self.BOARD_WIDTH, self.x4, self.y3 + \
+                                                      self.BOARD_WIDTH, self.y4
+
+        # fill the board with both KI and player pawns
+
+    def fill_board_pawns(self):
+        print("draw pawns")
+        self.fill_board_player_pawns()
+        self.fill_board_KI_pawns()
 
     ###################################################################################################################
     ################################ FILL THE BOARD WITH PAWNS ########################################################
@@ -81,6 +79,7 @@ class Board:
                                                       self.BOARD_WIDTH, self.y4
 
     # draw the pawns on the player side
+
     def fill_board_player_pawns(self):
         ite, self.x3, self.x4, self.y3, self.y4 = 0, self.BOARD_WIDTH / 5 + self.rand, self.BOARD_WIDTH * (
                 self.BOARD_SIZE - 1) + self.BOARD_WIDTH / 5 + self.rand, \
@@ -95,50 +94,10 @@ class Board:
                                                       self.BOARD_WIDTH, self.y4
 
     # fill the board with both KI and player pawns
+
     def fill_board_pawns(self):
         self.fill_board_player_pawns()
         self.fill_board_KI_pawns()
-
-    ###################################################################################################################
-    ################################ FILL THE BOARD WITH QUEENS #######################################################
-    ###################################################################################################################
-    def fill_board_queen(self):
-        self.fill_board_KI_queen()
-        self.fill_board_player_queen()
-
-    def fill_board_KI_queen(self):
-        ite, self.x3, self.x4, self.y3, self.y4 = 0, self.BOARD_WIDTH / 5 + self.rand, self.BOARD_WIDTH / 5 \
-                                                  + self.rand, self.BOARD_WIDTH - self.BOARD_WIDTH / 5 + self.rand, \
-                                                  self.BOARD_WIDTH - self.BOARD_WIDTH / 5 + self.rand
-        i = 0
-        while i < 6:
-            self.can.create_rectangle(self.x3, self.x4, self.y3, self.y4, fill='yellow')
-            i, ite, self.x3, self.x4, self.y3, self.y4 = i + 1, ite + 2, self.x3 + self.BOARD_WIDTH * 2, \
-                                                         self.x4, self.y3 + self.BOARD_WIDTH * 2, self.y4
-            if ite == 6:
-                ite, self.x3, self.x4, self.y3, self.y4 = 0, self.BOARD_WIDTH / 5 + self.BOARD_WIDTH + self.rand, \
-                                                          self.BOARD_WIDTH + self.BOARD_WIDTH / 5 + self.rand, \
-                                                          self.BOARD_WIDTH - self.BOARD_WIDTH / 5 + self.BOARD_WIDTH + \
-                                                          self.rand, \
-                                                          self.BOARD_WIDTH * 2 - self.BOARD_WIDTH / 5 + self.rand
-
-    def fill_board_player_queen(self):
-        ite, self.x3, self.x4, self.y3, self.y4 = 0, self.BOARD_WIDTH / 5 + self.rand, self.BOARD_WIDTH * (
-                self.BOARD_SIZE - 2) + self.BOARD_WIDTH / 5 + self.rand, self.BOARD_WIDTH - self.BOARD_WIDTH / 5 + \
-                                                  self.rand, self.BOARD_WIDTH * (
-                                                          self.BOARD_SIZE - 1) - self.BOARD_WIDTH / 5 + self.rand
-        i = 0
-        while i < self.BOARD_SIZE:
-            self.can.create_oval(self.x3, self.x4, self.y3, self.y4, fill='red')
-            i, ite, self.x3, self.x4, self.y3, self.y4 = i + 1, ite + 2, self.x3 + self.BOARD_WIDTH * 2, \
-                                                         self.x4, self.y3 + self.BOARD_WIDTH * 2, self.y4
-            if ite == 6:
-                ite, self.x3, self.x4, self.y3, self.y4 = 0, self.BOARD_WIDTH / 5 + self.BOARD_WIDTH + \
-                                                          self.rand, self.BOARD_WIDTH * (self.BOARD_SIZE - 2) + \
-                                                          self.BOARD_WIDTH / 5 + self.BOARD_WIDTH + self.rand, \
-                                                          self.BOARD_WIDTH - self.BOARD_WIDTH / 5 + self.BOARD_WIDTH + \
-                                                          self.rand, self.BOARD_WIDTH * self.BOARD_SIZE - \
-                                                          self.BOARD_WIDTH / 5 + self.rand
 
     ###################################################################################################################
     ################################   BAUERNSCHACH METHODES   ########################################################
@@ -236,8 +195,9 @@ class Board:
         self.selected_square_bauernschach(event.x, event.y)
 
     def back(self):
-        self.back_player()
-        self.back_KI()
+        print("back")
+        Bauernschach.back_player(self)
+        Bauernschach.back_KI(self)
 
     def back_KI(self):
         old_x = self.played_move_KI[0][0]
