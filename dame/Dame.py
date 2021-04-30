@@ -11,7 +11,7 @@ class Dame:
         self.__logic = DameLogic.DameLogic()
 
 
-    #public methods
+    # public methods
     def get_list_of_possible_moves(self, row, column):
         self.__possible_moves = self.__logic.get_possible_moves_for(row, column)
         return self.__get_wrapped_moves()
