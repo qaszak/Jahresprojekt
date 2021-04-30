@@ -37,7 +37,7 @@ class DameLogic:
         if self.__is_queen_at(row, column):
             queen = self.__get_queen_at(row, column)
             if (not check_possible_in_turn) or (check_possible_in_turn and self.__is_players_turn(queen)):
-                moves = self.__movement_logic.get_possible_moves_for(queen)
+                moves = self.__movement_logic.get_moves_for(queen)
         return moves
 
 

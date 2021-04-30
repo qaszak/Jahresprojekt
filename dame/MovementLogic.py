@@ -13,11 +13,13 @@ class MovementLogic:
 
 
     #public methods
-    def get_possible_moves_for(self, queen):
+    def get_moves_for(self, queen):
         moves = []
-        for move in self.__get_potential_moves_for(queen):
-            if self.__is_move_valid(move):
-                moves.append(move)
+        hitting_moves = self.__get_hitting_moves_for_player(queen)
+        if len(hitting_moves) == 0:
+            moves = self.__get_possible_moves_for(queen)
+        else:
+            moves = self.__get_hitting_moves_for_queen(hitting_moves, queen)
         return moves
 
 
@@ -34,7 +36,31 @@ class MovementLogic:
         return hit_queen
 
 
-    # private helper methods
+    # private methods
+    def __get_hitting_moves_for_player(self, queen):
+        hitting_moves = []
+        for queen in self.__board.get_queens_for(queen.get_player()):
+            for move in self.__get_possible_moves_for(queen):
+                if self.__is_hitting_move(move):
+                    hitting_moves.append(move)
+        return hitting_moves
+
+
+    def __get_hitting_moves_for_queen(self, hitting_moves, queen):
+        moves = []
+        for move in hitting_moves:
+            if move.get_queen() == queen:
+                moves.append(move)
+        return moves
+
+
+    def __get_possible_moves_for(self, queen):
+        moves = []
+        for move in self.__get_potential_moves_for(queen):
+            if self.__is_move_valid(move):
+                moves.append(move)
+        return moves
+
 
     def __get_potential_moves_for(self, queen):
         moves = []
