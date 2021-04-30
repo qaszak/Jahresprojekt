@@ -127,3 +127,37 @@ class MovementLogic:
 
     def __calculate_column_distance(self, move):
         return move.get_column() - move.get_queen().get_column()
+
+
+
+    ################### UNCOMMENT TO RUN TESTCASES.PY ###################
+
+    """
+    
+    
+    def calculate_row_distance(self, move):
+        return self.__calculate_row_distance(move)
+
+    def calculate_column_distance(self, move):
+        return self.__calculate_column_distance(move)
+
+    def is_hitting_move(self, move):
+        return self.__is_hitting_move(move)
+
+    def is_non_hitting_move(self, move):
+        return self.__is_non_hitting_move(move)
+
+    def is_move_blocked_by_queen(self, move):
+        return self.__is_move_blocked_by_queen(move)
+
+    def is_row_direction_valid(self, move):
+        return self.__is_row_direction_valid(move)
+
+    def is_move_in_board(self, move):
+        return self.__is_move_in_board(move)
+
+    def is_move_valid(self, move):
+        return self.__is_move_valid(move)
+    
+    
+    """
