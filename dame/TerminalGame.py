@@ -11,11 +11,9 @@ while True:
         print(dame.get_print_of_board())
 
         while True:
-            command_2 = input("(s) select queen, (p) print board or (q) quit game: ")
+            command_2 = input("(s) select queen, (q) quit game: ")
             if command_2 == "q":
                 break
-            elif command_2 == "p":
-                print(dame.get_print_of_board())
             elif command_2 == "s":
                 # Select Queen
                 print("\n\tSelect a queen")
