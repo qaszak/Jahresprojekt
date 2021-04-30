@@ -8,19 +8,19 @@ class AdapterPrint:
                  "\nQueens: " + str(external_board.get_number_of_queens_human()) + \
                  "\t\tQueens: " + str(external_board.get_number_of_queens_ai()) + \
                  "\nScore: " + str(external_board.get_score()) + "\n\nCurrent Turn: " + \
-                 str(external_board.get_player_turn()) + "\n\n" + \
-                 str(self.__format_board(external_board.get_board()))
+                 str(external_board.get_name_player_turn()) + " (" + str(external_board.get_character_player_turn())  + \
+                 ")\n\n" + str(self.__format_board(external_board.get_board()))
         return output
 
 
     def get_print_of_possible_moves(self, row, column, moves):
-        queen = " queen (" + str(row) + "," + str(column) + ")"
+        position = "(" + str(row) + "," + str(column) + ")"
         if len(moves) == 0:
-            output = "\tNo moves possible for " + queen
+            output = "\n\tNo moves possible for " + position
         else:
-            output = "\tPossible moves for " + queen + ":\n"
+            output = "\n\tPossible moves for queen " + position + ":\n\t\t"
             for move in moves:
-                output += "\t(" + str(move.get_row()) + "," + str(move.get_column()) + ")"
+                output += "(" + str(move.get_row()) + "," + str(move.get_column()) + ") "
         return output
 
 
@@ -31,9 +31,3 @@ class AdapterPrint:
                 output += ("| " + str(board[column][row]) + " ")
             output += "|\n-------------------------\n"
         return output
-
-
-
-
-
-
