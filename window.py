@@ -214,7 +214,7 @@ def create_window_content(window, content_type):
         hard_button_text = "Schwer"
 
         leaderboard_button_color = "#e6ac00"
-        leaderboard_button_active_color = "#648700"
+        leaderboard_button_active_color = "#bd8d00"
         leaderboard_button_font_color = "#ffffff"
         leaderboard_button_font_active_color = "#dddddd"
         leaderboard_button_width = 18
@@ -446,4 +446,4 @@ def delete_widgets(container):
         widget.destroy()
 
 
-create_window("game")
+create_window("login")
