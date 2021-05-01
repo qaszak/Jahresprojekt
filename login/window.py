@@ -8,12 +8,14 @@ from testDB import DB
 class Window:
     def __init__(self, content_type):
         ### WINDOW PARAMS
-        # self.window = Tk()
         self.WINDOW_TITLE = "Jahresprojekt 2021 - FA11 - Gruppe 3"
         self.WINDOW_WIDTH = 800
         self.WINDOW_HEIGHT = 600
         self.WINDOW_COLOR = "#96bfd6"
         self.create_window(content_type)
+
+    def play_pawnchess(self):
+        Play_bauernschach(self.window)
 
     def login_btn_clicked(self):
         print("Clicked")
@@ -22,13 +24,12 @@ class Window:
         db = DB()
         if db.is_exist(username, password):
             self.lbl_result2.config(text="Welcome", fg="green")
-            self.create_window_content(self.window,"bauernschach")
+            self.create_window_content(self.window, "game_select")
+            # self.create_window_content(self.window,"bauernschach")
         else:
             self.lbl_result2.config(text="Username or password is wrong", fg="red")
 
     def create_window_content(self, window, content_type):
-        if content_type == "bauernschach":
-            Play_bauernschach(window)
         if content_type == "login":
             print(content_type)
             print()
@@ -222,13 +223,13 @@ class Window:
                                       text=pawnchess_button_text, font='sans 16 bold',
                                       activebackground=pawnchess_button_active_color,
                                       activeforeground=pawnchess_button_font_active_color,
-                                      command=lambda: self.change_content_type(self.window, "game_settings"))
+                                      command=self.play_pawnchess)
             checkers_button = Button(window, bg=checkers_button_color, fg=checkers_button_font_color,
                                      width=checkers_button_width, height=checkers_button_height,
                                      text=checkers_button_text, font='sans 16 bold',
                                      activebackground=checkers_button_active_color,
                                      activeforeground=checkers_button_font_active_color,
-                                     command=lambda: self.change_content_type(self.window, "game_settings"))
+                                     command=self.create_blank_window)
             tictactoe_button = Button(self.window, bg=tictactoe_button_color, fg=tictactoe_button_font_color,
                                       width=tictactoe_button_width, height=tictactoe_button_height,
                                       text=tictactoe_button_text, font='sans 16 bold',
@@ -387,6 +388,13 @@ class Window:
         self.create_window_content(self.window, content_type)
 
         self.window.mainloop()
+
+    def create_blank_window(self):
+        window = Tk()
+        window.geometry(f"{self.WINDOW_WIDTH}x{self.WINDOW_HEIGHT}")
+        window.title(self.WINDOW_TITLE)
+        window.configure(background=self.WINDOW_COLOR)
+        window.mainloop()
 
     def change_content_type(self, window, content_type):
         self.delete_widgets(self.window)

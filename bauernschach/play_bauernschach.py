@@ -5,7 +5,7 @@ class Play_bauernschach():
     def __init__(self, page):
         spiel = "bauernschach"
         self.master = page
-        # frame.pack_forget()
+        #self.master.pack_forget()
         Board(page, spiel)
 
 
