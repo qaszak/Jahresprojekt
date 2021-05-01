@@ -63,22 +63,27 @@ class DameLogic:
                                                    self.__HUMAN_QUEEN_CHARACTER, self.__EMPTY_TILE_CHARACTER)
 
 
-    def execute_move(self, move):
-        hit_queen = self.__movement_logic.get_hit_queen(self.__board, move)
+    def execute_move(self, move, board=None):
+        if board is None:
+            board = self.__board
+        hit_queen = self.__movement_logic.get_hit_queen(board, move)
         if hit_queen is None:
-            self.__board.execute_move(move)
-            self.__board.close_turn()
-            self.__switch_player_turn()
+            board.execute_move(move)
+            board.close_turn()
+            self.__switch_player_turn(board)
         else:
-            self.__board.update_turn(move)
-            self.__board.execute_move(move)
-            self.__board.remove_queen(hit_queen)
+            board.update_turn(move)
+            board.execute_move(move)
+            board.remove_queen(hit_queen)
             if self.__is_human_move(move):
-                self.__board.increment_score_by(10)
-            if len(self.__movement_logic.get_moves_for(self.__board, move.get_queen())) == 0:
-                self.__board.close_turn()
+                board.increment_score_by(10)
+            if len(self.__movement_logic.get_moves_for(board, move.get_queen())) == 0:
+                board.close_turn()
                 self.__switch_player_turn()
 
+
+    def get_opponent(self, player):
+        return self.__HUMAN_PLAYER if player == self.__AI_PLAYER else self.__AI_PLAYER
 
 
     # private methods
@@ -118,11 +123,11 @@ class DameLogic:
         return self.__board.get_player_turn() == queen.get_player()
 
 
-    def __switch_player_turn(self):
-        if self.__board.get_player_turn() == self.__AI_PLAYER:
-            self.__board.set_player_turn(self.__HUMAN_PLAYER)
+    def __switch_player_turn(self, board):
+        if board.get_player_turn() == self.__AI_PLAYER:
+            board.set_player_turn(self.__HUMAN_PLAYER)
         else:
-            self.__board.set_player_turn(self.__AI_PLAYER)
+            board.set_player_turn(self.__AI_PLAYER)
 
 
     ################### UNCOMMENT TO RUN TESTCASES.PY #######################
