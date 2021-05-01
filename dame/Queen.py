@@ -12,6 +12,10 @@ class Queen:
         self.__character = character
 
 
+    def clone(self):
+        return Queen(self.get_row(), self.get_column(), self.get_player(), self.get_player())
+
+
     def set_position(self, row, column):
         self.__row = row
         self.__column = column
