@@ -34,17 +34,19 @@ class DameLogic:
 
 
     # public methods
-    def get_possible_moves_for(self, row, column, check_possible_in_turn = True):
+    def get_possible_moves_for(self, row, column, board=None, check_possible_in_turn = True):
         moves = []
+        if board is None:
+            board = self.__board
         queen = self.__get_queen_at(row, column)
         if queen is not None:
             if (not check_possible_in_turn) or (check_possible_in_turn and self.__is_players_turn(queen)):
-                moves = self.__movement_logic.get_moves_for(queen, check_possible_in_turn)
+                moves = self.__movement_logic.get_moves_for(board, queen, check_possible_in_turn)
         return moves
 
 
     def get_winner(self):
-        winner = self.__win_logic.get_winner()
+        winner = self.__win_logic.get_winner(self.__board)
         return self.__get_player_name(winner)
 
 
@@ -62,7 +64,7 @@ class DameLogic:
 
 
     def execute_move(self, move):
-        hit_queen = self.__movement_logic.get_hit_queen(move)
+        hit_queen = self.__movement_logic.get_hit_queen(self.__board, move)
         if hit_queen is None:
             self.__board.execute_move(move)
             self.__board.close_turn()
@@ -73,7 +75,7 @@ class DameLogic:
             self.__board.remove_queen(hit_queen)
             if self.__is_human_move(move):
                 self.__board.increment_score_by(10)
-            if len(self.__movement_logic.get_moves_for(move.get_queen())) == 0:
+            if len(self.__movement_logic.get_moves_for(self.__board, move.get_queen())) == 0:
                 self.__board.close_turn()
                 self.__switch_player_turn()
 
@@ -87,8 +89,8 @@ class DameLogic:
                                                            self.__AI_PLAYER, self.__HUMAN_PLAYER,
                                                            self.__AI_QUEEN_CHARACTER, self.__HUMAN_QUEEN_CHARACTER,
                                                            self.__EMPTY_TILE_CHARACTER, self.__PLAYER_FIRST_MOVE)
-        self.__movement_logic = MovementLogic.MovementLogic(self.__board, self.__AI_PLAYER, self.__HUMAN_PLAYER)
-        self.__win_logic = WinLogic.WinLogic(self.__board, self, self.__AI_PLAYER, self.__HUMAN_PLAYER)
+        self.__movement_logic = MovementLogic.MovementLogic(self.__AI_PLAYER, self.__HUMAN_PLAYER)
+        self.__win_logic = WinLogic.WinLogic(self, self.__AI_PLAYER, self.__HUMAN_PLAYER)
 
 
     def __is_human_move(self, move):
