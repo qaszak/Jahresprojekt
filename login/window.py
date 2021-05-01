@@ -12,22 +12,71 @@ class Window:
         self.WINDOW_WIDTH = 800
         self.WINDOW_HEIGHT = 600
         self.WINDOW_COLOR = "#96bfd6"
+        ### GAME PARAMS
+        self.login = None
+        self.game = None
+        self.PAWN_CHESS = "bauernschach"
+        self.DAME = "dame"
+        self.TIC_TAC_TAE = "tic-tac-toe"
+        self.difficulty = None
+        self.EASY = "easy"
+        self.NORMAL = "normal"
+        self.HARD = "hard"
+        ##### ERROR MESSAGES ###
+        self.USERNAME_ALREADY_EXIST = "USERNAME ALREADY EXIST"
+        self.USERNAME_PASSWORD_WRONG = "USERNAME OR PASSWORD WRONG"
         self.create_window(content_type)
 
-    def play_pawnchess(self):
+    def leaderboard(self):
+        self.create_blank_window()
+
+    def play_easy(self):
+        self.difficulty = self.EASY
+        self.play(self.difficulty)
+
+    def play_normal(self):
+        self.difficulty = self.NORMAL
+        self.play(self.difficulty)
+
+    def play_hard(self):
+        self.difficulty = self.HARD
+        self.play(self.difficulty)
+
+    def play(self, difficulty):
+        if self.game == self.PAWN_CHESS:
+            self.play_pawnchess(difficulty)
+
+    def play_pawnchess(self, difficulty):
+        db = DB()
+        db.add_player_stats(self.login, self.game, self.difficulty)
         Play_bauernschach(self.window)
 
-    def login_btn_clicked(self):
-        print("Clicked")
+    def register_btn_clicked(self):
         username = self.username_entry.get()
         password = self.password_entry.get()
         db = DB()
+        if db.is_exist_register(username):
+            self.lbl_result2.config(text=self.USERNAME_ALREADY_EXIST, fg="red")
+            # self.create_window_content(self.window, "game_select")
+            # self.create_window_content(self.window,"bauernschach")
+        else:
+            # self.lbl_result2.config(text="Username or password is wrong", fg="red")
+            db.add_user(username, password)
+            db.add_best_list(username)
+        db.close_con()
+
+    def login_btn_clicked(self):
+        # print("Clicked")
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+        self.login = username
+        db = DB()
         if db.is_exist(username, password):
-            self.lbl_result2.config(text="Welcome", fg="green")
+            # self.lbl_result2.config(text="Welcome", fg="green")
             self.create_window_content(self.window, "game_select")
             # self.create_window_content(self.window,"bauernschach")
         else:
-            self.lbl_result2.config(text="Username or password is wrong", fg="red")
+            self.lbl_result2.config(text=self.USERNAME_PASSWORD_WRONG, fg="red")
 
     def create_window_content(self, window, content_type):
         if content_type == "login":
@@ -106,7 +155,8 @@ class Window:
                                      width=register_button_width, height=register_button_height,
                                      text=register_button_text, font='sans 16 bold',
                                      activebackground=register_button_active_color,
-                                     activeforeground=register_button_font_active_color)
+                                     activeforeground=register_button_font_active_color,
+                                     command=self.register_btn_clicked)
             username_label = Label(text="Nutzername", bg=background_color_secondary, fg="#ffffff", font='sans 16')
             password_label = Label(text="Passwort", bg=background_color_secondary, fg="#ffffff", font='sans 16')
             welcome_label = Label(text="Willkommen", bg=background_color_secondary, fg="#ffffff", font='sans 32 bold')
@@ -223,19 +273,19 @@ class Window:
                                       text=pawnchess_button_text, font='sans 16 bold',
                                       activebackground=pawnchess_button_active_color,
                                       activeforeground=pawnchess_button_font_active_color,
-                                      command=self.play_pawnchess)
+                                      command=self.select_difficulty_pawnchess)
             checkers_button = Button(window, bg=checkers_button_color, fg=checkers_button_font_color,
                                      width=checkers_button_width, height=checkers_button_height,
                                      text=checkers_button_text, font='sans 16 bold',
                                      activebackground=checkers_button_active_color,
                                      activeforeground=checkers_button_font_active_color,
-                                     command=self.create_blank_window)
+                                     command=self.select_difficulty_dame)
             tictactoe_button = Button(self.window, bg=tictactoe_button_color, fg=tictactoe_button_font_color,
                                       width=tictactoe_button_width, height=tictactoe_button_height,
                                       text=tictactoe_button_text, font='sans 16 bold',
                                       activebackground=tictactoe_button_active_color,
                                       activeforeground=tictactoe_button_font_active_color,
-                                      command=lambda: self.change_content_type(self.window, "game_settings"))
+                                      command=self.select_difficulty_tictactoe)
             select_label = Label(text="Wähle ein Spiel", bg=background_color_secondary, fg="#ffffff",
                                  font='sans 24 bold')
             credit_label = Label(text="© Jahresprojekt 2021 - FA11 - Gruppe 3", bg=background_color_primary,
@@ -343,22 +393,26 @@ class Window:
             easy_button = Button(window, bg=easy_button_color, fg=easy_button_font_color, width=easy_button_width,
                                  height=easy_button_height, text=easy_button_text, font='sans 16 bold',
                                  activebackground=easy_button_active_color,
-                                 activeforeground=easy_button_font_active_color)
+                                 activeforeground=easy_button_font_active_color,
+                                 command=self.play_easy)
             normal_button = Button(window, bg=normal_button_color, fg=normal_button_font_color,
                                    width=normal_button_width, height=normal_button_height,
                                    text=normal_button_text, font='sans 16 bold',
                                    activebackground=normal_button_active_color,
-                                   activeforeground=normal_button_font_active_color)
+                                   activeforeground=normal_button_font_active_color,
+                                   command=self.play_normal)
             hard_button = Button(window, bg=hard_button_color, fg=hard_button_font_color,
                                  width=hard_button_width, height=hard_button_height,
                                  text=hard_button_text, font='sans 16 bold',
                                  activebackground=hard_button_active_color,
-                                 activeforeground=hard_button_font_active_color)
+                                 activeforeground=hard_button_font_active_color,
+                                 command=self.play_hard)
             leaderboard_button = Button(window, bg=leaderboard_button_color, fg=leaderboard_button_font_color,
                                         width=leaderboard_button_width, height=leaderboard_button_height,
                                         text=leaderboard_button_text, font='sans 16 bold',
                                         activebackground=leaderboard_button_active_color,
-                                        activeforeground=leaderboard_button_font_active_color)
+                                        activeforeground=leaderboard_button_font_active_color,
+                                        command=self.leaderboard)
             select_label = Label(text="Wähle einen Schwierigkeitsgrad", bg=background_color_secondary,
                                  fg="#ffffff", font='sans 24 bold')
             credit_label = Label(text="© Jahresprojekt 2021 - FA11 - Gruppe 3",
@@ -394,6 +448,45 @@ class Window:
         window.geometry(f"{self.WINDOW_WIDTH}x{self.WINDOW_HEIGHT}")
         window.title(self.WINDOW_TITLE)
         window.configure(background=self.WINDOW_COLOR)
+
+        l = Label(window, text="LEADER BOARD")
+        l.config(font=("Courier", 14))
+
+        b = Text(window, height=2, width=10)
+        b.grid(row=1, column=1)
+        b.insert(END, "-----")
+        text = "NAME"
+        b = Text(window, height=2, width=10)
+        b.grid(row=1, column=2)
+        b.insert(END, text)
+        text = "SCORE"
+        b = Text(window, height=2, width=10)
+        b.grid(row=1, column=3)
+        b.insert(END, text)
+        i = 1
+        db = DB()
+        rows = []
+        if self.game == self.PAWN_CHESS:
+            rows = db.get_pawn_chess_best_list()
+        if self.game == self.DAME:
+            rows = db.get_dame_best_list()
+        if self.game == self.TIC_TAC_TAE:
+            rows = db.get_tic_tac_toe_best_list()
+        print(rows)
+        for row in rows:
+            b = Text(window, height=5, width=10)
+            b.grid(row=i + 1, column=1)
+            b.insert(END, "player")
+            text = row[1]
+            b = Text(window, height=5, width=10)
+            b.grid(row=i + 1, column=2)
+            b.insert(END, text)
+            text = row[7]
+            b = Text(window, height=5, width=10)
+            b.grid(row=i + 1, column=3)
+            b.insert(END, text)
+            i = i + 1
+        db.close_con()
         window.mainloop()
 
     def change_content_type(self, window, content_type):
@@ -403,6 +496,19 @@ class Window:
     def delete_widgets(self, container):
         for widget in container.winfo_children():
             widget.destroy()
+
+    def select_difficulty_pawnchess(self):
+        self.select_difficulty(self.PAWN_CHESS)
+
+    def select_difficulty_tictactoe(self):
+        self.select_difficulty(self.TIC_TAC_TAE)
+
+    def select_difficulty_dame(self):
+        self.select_difficulty(self.DAME)
+
+    def select_difficulty(self, game):
+        self.game = game
+        self.change_content_type(self.window, "game_settings")
 
 
 Window("login")

@@ -196,11 +196,18 @@ class DB:
                 return TRUE
         return FALSE
 
+    def is_exist_register(self, login):
+        rows = self.all_users()
+        for row in rows:
+            if row[1] == login:
+                return TRUE
+        return FALSE
+
     def close_con(self):
         self.con.close()
 
 
-#db = DB()
+db = DB()
 # db.add_user("zak", "123")
 #rows = db.all_users()
 #for row in rows:
@@ -214,7 +221,7 @@ class DB:
 # db.add_best_list("zak")
 #db.set_score("zak", "dame", 10)
 
-#print("best_list_dame ", db.get_best_list("dame"))
-#print("best_list_pawn ", db.get_best_list("pawnchess"))
-#print("best_list_tic ", db.get_best_list("tic-tac-toe"))
+print("best_list_dame ", db.get_best_list("dame"))
+print("best_list_pawn ", db.get_best_list("pawnchess"))
+print("best_list_tic ", db.get_best_list("tic-tac-toe"))
 #print(db.find_user("zak"))
