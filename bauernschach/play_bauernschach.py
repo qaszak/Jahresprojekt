@@ -1,4 +1,4 @@
-from bauernschach.board import Board
+from board.board import Board
 
 
 class Play_bauernschach():

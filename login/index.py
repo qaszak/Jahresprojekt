@@ -2,7 +2,7 @@ from tkinter import *
 
 ###
 from bauernschach.play_bauernschach import Play_bauernschach
-from testDB import DB
+from dbManagement.database import DB
 
 
 class Window:
@@ -163,7 +163,7 @@ class Window:
             credit_label = Label(text="© Jahresprojekt 2021 - FA11 - Gruppe 3",
                                  bg=background_color_primary, fg="#ffffff", font='sans 16')
 
-            self.lbl_result2 = Label(text="", bg=background_color_secondary, fg="#ffffff", font='sans 20 bold')
+            self.lbl_result2 = Label(text="", bg=background_color_secondary, fg="#ffffff", font='sans 18 bold')
             self.lbl_result2.place(x=175, y=450)
 
             credit_label.place(x=205, y=550)

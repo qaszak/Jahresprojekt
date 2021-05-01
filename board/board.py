@@ -1,11 +1,9 @@
 ##############                    #################
 #######      JAHRESPROJEKT GROUP 3       ##########
 ##############                    #################
-from random import choice
-from tkinter import *
 
 from bauernschach.bauernschach_logic import *
-from bauernschach.dame_logic import Dame
+from dame.dame_logic import Dame
 
 
 class Board:

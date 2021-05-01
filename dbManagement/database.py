@@ -1,10 +1,10 @@
 import sqlite3
 from tkinter import TRUE, FALSE
-
+import dbManagement
 
 class DB:
     def __init__(self):
-        self.con = sqlite3.connect("db/JAHRESPROJEKT.db")
+        self.con = sqlite3.connect("../login/JAHRESPROJEKT.db")
         self.cursor = self.con.cursor()
         sql = "CREATE TABLE IF NOT EXISTS USER(" \
               "ID_USER INTEGER PRIMARY KEY AUTOINCREMENT," \

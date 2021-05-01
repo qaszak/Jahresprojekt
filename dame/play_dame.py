@@ -1,4 +1,4 @@
-from board import Board, Tk
+from board.board import Board, Tk
 
 
 class Test2():
