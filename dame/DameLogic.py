@@ -73,6 +73,10 @@ class DameLogic:
             self.__board.remove_queen(hit_queen)
             if self.__is_human_move(move):
                 self.__board.increment_score_by(10)
+            if len(self.__movement_logic.get_moves_for(move.get_queen())) == 0:
+                self.__board.close_turn()
+                self.__switch_player_turn()
+
 
 
     # private methods
@@ -117,9 +121,8 @@ class DameLogic:
 
 
     ################### UNCOMMENT TO RUN TESTCASES.PY #######################
-
-    """
     
+    """"
     
     def load_custom_board(self, board):
         self.__initialize_board(board)
@@ -156,5 +159,6 @@ class DameLogic:
             output.append(Move.Move(queen, destination_row, destination_column))
         return output
         
-        
     """
+        
+
