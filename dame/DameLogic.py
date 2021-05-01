@@ -122,6 +122,7 @@ class DameLogic:
 
     ################### UNCOMMENT TO RUN TESTCASES.PY #######################
     
+    """"
     
     def load_custom_board(self, board):
         self.__initialize_board(board)
@@ -157,5 +158,7 @@ class DameLogic:
             queen = self.__board.get_tile(start_row, start_column)
             output.append(Move.Move(queen, destination_row, destination_column))
         return output
+        
+    """
         
 
