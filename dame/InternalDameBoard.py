@@ -10,7 +10,7 @@ class InternalDameBoard:
     __player_turn = -1
     __in_turn_previously_moved_queen = None
 
-    def __init__(self, board, parse=True, in_turn_previously_moved_queen=None, ai_player="", human_player="",
+    def __init__(self, board, parse, in_turn_previously_moved_queen, ai_player="", human_player="",
                  ai_queen_character="", human_queen_character="", empty_tile_character="", player_first_move=""):
         if parse:
             self.__parse_board(board, ai_player, human_player, ai_queen_character, human_queen_character, empty_tile_character)

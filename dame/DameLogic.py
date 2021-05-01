@@ -81,7 +81,10 @@ class DameLogic:
 
     # private methods
     def __initialize_board(self, board):
-        self.__board = InternalDameBoard.InternalDameBoard(board, self.__AI_PLAYER, self.__HUMAN_PLAYER,
+        PARSE_BOARD = True
+        IN_TURN_PREVIOUSLY_MOVED_QUEEN = None
+        self.__board = InternalDameBoard.InternalDameBoard(board, PARSE_BOARD, IN_TURN_PREVIOUSLY_MOVED_QUEEN,
+                                                           self.__AI_PLAYER, self.__HUMAN_PLAYER,
                                                            self.__AI_QUEEN_CHARACTER, self.__HUMAN_QUEEN_CHARACTER,
                                                            self.__EMPTY_TILE_CHARACTER, self.__PLAYER_FIRST_MOVE)
         self.__movement_logic = MovementLogic.MovementLogic(self.__board, self.__AI_PLAYER, self.__HUMAN_PLAYER)
