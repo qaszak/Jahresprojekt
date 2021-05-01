@@ -400,28 +400,20 @@ def create_window_content(window, content_type):
                     else:
                         window_background.create_rectangle(i, j, i+background_square_size, j+background_square_size, fill=background_square_primary_color, outline=background_square_primary_color)
 
-        window_background.create_rectangle(32, 32, 768, 568, fill=background_color_secondary)
+        window_background.create_rectangle(190, 32, 610, 568, fill=background_color_secondary)
 
         back_button = Button(window, bg=back_button_color, fg=back_button_font_color, width=back_button_width, height=back_button_height, text=back_button_text, font='sans 16 bold', activebackground=back_button_active_color, activeforeground=back_button_font_active_color, command=lambda:change_content_type(window, "game_settings"))
         title_label = Label(text="Bestenlisten", bg=background_color_secondary, fg="#ffffff", font='sans 24 bold')
-        easy_label = Label(text="Einfach", bg=background_color_secondary, fg="#ffffff", font='sans 18 bold')
-        normal_label = Label(text="Normal", bg=background_color_secondary, fg="#ffffff", font='sans 18 bold')
-        hard_label = Label(text="Schwer", bg=background_color_secondary, fg="#ffffff", font='sans 18 bold')
         credit_label = Label(text="© Jahresprojekt 2021 - FA11 - Gruppe 3", bg=background_color_primary, fg="#ffffff", font='sans 12')
-        easy_list = Listbox(height=15, width=20, font='sans 14 bold', bg="#2d4d63", fg="#ffffff")
-        normal_list = Listbox(height=15, width=20, font='sans 14 bold', bg="#2d4d63", fg="#ffffff")
-        hard_list = Listbox(height=15, width=20, font='sans 14 bold', bg="#2d4d63", fg="#ffffff")
+        player_list = Listbox(height=15, width=24, font='sans 14 bold', bg="#2d4d63", fg="#ffffff")
+        point_list = Listbox(height=15, width=8, font='sans 14 bold', bg="#2d4d63", fg="#ffffff")
 
         credit_label.place(x=245, y=572)
         window_background.place(x=0, y=0)
-        title_label.place(x=301, y=50)
-        easy_label.place(x=115, y=100)
-        normal_label.place(x=360, y=100)
-        hard_label.place(x=595, y=100)
-        easy_list.place(x=48, y=150)
-        normal_list.place(x=289, y=150)
-        hard_list.place(x=530, y=150)
-        back_button.place(x=707, y=515)
+        title_label.place(x=301, y=65)
+        player_list.place(x=215, y=135)
+        point_list.place(x=495, y=135)
+        back_button.place(x=540, y=505)
         ###
 
 
@@ -446,4 +438,4 @@ def delete_widgets(container):
         widget.destroy()
 
 
-create_window("login")
+create_window("leaderboard")
