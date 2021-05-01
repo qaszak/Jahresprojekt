@@ -157,6 +157,7 @@ class Window:
                                      activebackground=register_button_active_color,
                                      activeforeground=register_button_font_active_color,
                                      command=self.register_btn_clicked)
+
             username_label = Label(text="Nutzername", bg=background_color_secondary, fg="#ffffff", font='sans 16')
             password_label = Label(text="Passwort", bg=background_color_secondary, fg="#ffffff", font='sans 16')
             welcome_label = Label(text="Willkommen", bg=background_color_secondary, fg="#ffffff", font='sans 32 bold')
@@ -175,6 +176,7 @@ class Window:
             self.password_entry.place(x=300, y=350)
             login_button.place(x=175, y=400)
             register_button.place(x=400, y=400)
+
             ###
 
         if content_type == "game_select":
@@ -208,6 +210,14 @@ class Window:
             tictactoe_button_width = 14
             tictactoe_button_height = 0
             tictactoe_button_text = "Tic-Tac-Toe"
+
+            back_button_color = "#858585"
+            back_button_active_color = "#5e5e5e"
+            back_button_font_color = "#ffffff"
+            back_button_font_active_color = "#dddddd"
+            back_button_width = 3
+            back_button_height = 0
+            back_button_text = "⬅"
 
             self.WINDOW_WIDTH = 800
             self.WINDOW_HEIGHT = 600
@@ -290,13 +300,18 @@ class Window:
                                  font='sans 24 bold')
             credit_label = Label(text="© Jahresprojekt 2021 - FA11 - Gruppe 3", bg=background_color_primary,
                                  fg="#ffffff", font='sans 16')
-
+            back_button = Button(window, bg=back_button_color, fg=back_button_font_color, width=back_button_width,
+                                 height=back_button_height, text=back_button_text, font='sans 16 bold',
+                                 activebackground=back_button_active_color,
+                                 activeforeground=back_button_font_active_color,
+                                 command=lambda: self.change_content_type(window, "login"))
             credit_label.place(x=205, y=550)
             window_background.place(x=0, y=0)
             select_label.place(x=270, y=130)
             pawnchess_button.place(x=100, y=400)
             checkers_button.place(x=300, y=400)
             tictactoe_button.place(x=500, y=400)
+            back_button.place(x=643, y=450)
             ###
 
         if content_type == "game_settings":
@@ -331,6 +346,14 @@ class Window:
             hard_button_width = 14
             hard_button_height = 0
             hard_button_text = "Schwer"
+
+            back_button_color = "#858585"
+            back_button_active_color = "#5e5e5e"
+            back_button_font_color = "#ffffff"
+            back_button_font_active_color = "#dddddd"
+            back_button_width = 3
+            back_button_height = 0
+            back_button_text = "⬅"
 
             leaderboard_button_color = "#e6ac00"
             leaderboard_button_active_color = "#648700"
@@ -417,6 +440,11 @@ class Window:
                                  fg="#ffffff", font='sans 24 bold')
             credit_label = Label(text="© Jahresprojekt 2021 - FA11 - Gruppe 3",
                                  bg=background_color_primary, fg="#ffffff", font='sans 16')
+            back_button = Button(window, bg=back_button_color, fg=back_button_font_color, width=back_button_width,
+                                 height=back_button_height, text=back_button_text, font='sans 16 bold',
+                                 activebackground=back_button_active_color,
+                                 activeforeground=back_button_font_active_color,
+                                 command=lambda: self.change_content_type(window, "game_select"))
 
             credit_label.place(x=205, y=550)
             window_background.place(x=0, y=0)
@@ -425,6 +453,7 @@ class Window:
             normal_button.place(x=300, y=400)
             hard_button.place(x=500, y=400)
             leaderboard_button.place(x=275, y=450)
+            back_button.place(x=643, y=450)
             ###
 
         if content_type == "game":

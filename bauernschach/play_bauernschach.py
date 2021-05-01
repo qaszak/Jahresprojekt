@@ -1,4 +1,4 @@
-from board.board import Board
+from board.board import Board, Tk
 
 
 class Play_bauernschach():
@@ -9,5 +9,5 @@ class Play_bauernschach():
         Board(page, spiel)
 
 
-#page = Tk()
-#Play_bauernschach(page)
+page = Tk()
+Play_bauernschach(page)

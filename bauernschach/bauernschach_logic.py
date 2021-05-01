@@ -1,9 +1,12 @@
 from random import choice
 from tkinter import *
+from tkinter import messagebox
 
 
 class Bauernschach():
     def __init__(self, can, B_W, B_S, rand):
+        self.game_state = None
+        self.GAME_OVER = "GAME OVER"
         # the highlighted square
         self.highlighted_square = []
         # the last played move player
@@ -23,9 +26,6 @@ class Bauernschach():
         self.spiel = "bauernschach"
         self.last_selected = [0, 0]
         size = 6
-        # player and ki pawns position [column , line]
-        # player_pawns_position = [[0, 5], [1, 5], [2, 5], [3, 5], [4, 5], [5, 5]]
-        # KI_pawns_position = [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0], [5, 0]]
         self.player_pawns_position = []
         self.KI_pawns_position = []
         for i in range(size):
@@ -43,8 +43,7 @@ class Bauernschach():
             ite, self.x3, self.x4, self.y3, self.y4 = ite + 1, self.x3 + self.BOARD_WIDTH, self.x4, self.y3 + \
                                                       self.BOARD_WIDTH, self.y4
 
-        # draw the pawns on the player side
-
+    # draw the pawns on the player side
     def fill_board_player_pawns(self):
         ite, self.x3, self.x4, self.y3, self.y4 = 0, self.BOARD_WIDTH / 5 + self.rand, self.BOARD_WIDTH * (
                 self.BOARD_SIZE - 1) + self.BOARD_WIDTH / 5 + self.rand, \
@@ -117,8 +116,7 @@ class Bauernschach():
             c = 'grey'
         else:
             c = 'white'
-        # print("last possible moves col   line  ", col, line, c)
-        # print("highlited squares in removeSelection : ", self.highlighted_square)
+
         for square in self.highlighted_square:
             # print("square : ", square)
             col = square[0]
@@ -127,15 +125,10 @@ class Bauernschach():
                 c = 'grey'
             else:
                 c = 'white'
-            self.can.create_rectangle(col * self.BOARD_WIDTH + self.rand, line * self.BOARD_WIDTH + self.rand,
-                                      (col + 1) * self.BOARD_WIDTH + self.rand,
-                                      (line + 1) * self.BOARD_WIDTH + self.rand, fill=c)
+            self.draw_rectangle(col, line, c, 0)
             if self.is_position_free_from_KI_pawns(col, line) == FALSE:
                 t = self.BOARD_WIDTH / 5
-                self.can.create_rectangle(col * self.BOARD_WIDTH + t + self.rand,
-                                          line * self.BOARD_WIDTH + t + self.rand,
-                                          (col + 1) * self.BOARD_WIDTH - t + self.rand,
-                                          (line + 1) * self.BOARD_WIDTH - t + self.rand, fill='yellow')
+                self.draw_rectangle(col, line, 'yellow', t)
         self.highlighted_square = []
 
     def selected_square_bauernschach(self, x, y):
@@ -146,7 +139,6 @@ class Bauernschach():
         print("selected square ", self.last_selected)
         self.highlighted_square = []
 
-        # print("selected square ", col, line)
         self.can.create_rectangle(col * self.BOARD_WIDTH + self.rand, line * self.BOARD_WIDTH + self.rand,
                                   (col + 1) * self.BOARD_WIDTH + self.rand,
                                   (line + 1) * self.BOARD_WIDTH + self.rand,
@@ -204,10 +196,7 @@ class Bauernschach():
         old_y = self.played_move_KI[0][1]
         # draw oval in the old position
         t = self.BOARD_WIDTH / 5
-        self.can.create_rectangle(old_x * self.BOARD_WIDTH + t + self.rand,
-                                  old_y * self.BOARD_WIDTH + t + self.rand,
-                                  (old_x + 1) * self.BOARD_WIDTH - t + self.rand,
-                                  (old_y + 1) * self.BOARD_WIDTH - t + self.rand, fill='yellow')
+        self.draw_rectangle(old_x, old_y, 'yellow', t)
 
         new_x = self.played_move_KI[1][0]
         new_y = self.played_move_KI[1][1]
@@ -216,9 +205,7 @@ class Bauernschach():
         else:
             c_rectangle = 'white'
         # remove the old oval from the last position
-        self.can.create_rectangle(new_x * self.BOARD_WIDTH + self.rand, new_y * self.BOARD_WIDTH + self.rand,
-                                  (new_x + 1) * self.BOARD_WIDTH + self.rand,
-                                  (new_y + 1) * self.BOARD_WIDTH + self.rand, fill=c_rectangle)
+        self.draw_rectangle(new_x, new_y, c_rectangle, 0)
         self.KI_pawns_position[old_x] = [old_x, old_y]
 
     def back_player(self):
@@ -238,73 +225,60 @@ class Bauernschach():
         else:
             c_rectangle = 'white'
         # remove the old oval from the last position
-        self.can.create_rectangle(new_x * self.BOARD_WIDTH + self.rand, new_y * self.BOARD_WIDTH + self.rand,
-                                  (new_x + 1) * self.BOARD_WIDTH + self.rand,
-                                  (new_y + 1) * self.BOARD_WIDTH + self.rand, fill=c_rectangle)
+        self.draw_rectangle(new_x, new_y, c_rectangle, 0)
         self.player_pawns_position[old_x] = [old_x, old_y]
 
     def play_move_bauernschach(self, event):
-        col = int(event.x / self.BOARD_WIDTH)
-        line = int(event.y / self.BOARD_WIDTH)
-        # store the played move  [0] ::> old position [1] ::> new position
-        self.played_move_player = [[self.last_selected[0], self.last_selected[1]], [col, line]]
-        if (self.last_selected[0] + self.last_selected[1]) % 2 == 0:
-            c_rectangle = 'grey'
-        else:
-            c_rectangle = 'white'
+        if self.game_state != self.GAME_OVER:
+            col = int(event.x / self.BOARD_WIDTH)
+            line = int(event.y / self.BOARD_WIDTH)
+            # store the played move  [0] ::> old position [1] ::> new position
+            self.played_move_player = [[self.last_selected[0], self.last_selected[1]], [col, line]]
+            if (self.last_selected[0] + self.last_selected[1]) % 2 == 0:
+                c_rectangle = 'grey'
+            else:
+                c_rectangle = 'white'
 
-        if (col + line) % 2 == 0:
-            c_oval = 'grey'
-        else:
-            c_oval = 'white'
+            if (col + line) % 2 == 0:
+                c_oval = 'grey'
+            else:
+                c_oval = 'white'
 
-        # print("the played move col   line  ", col, line)
-        print("played move player : ", self.played_move_player)
-        # remove the highlight from the possible square
-        self.removeSelectionFromOthers_bauernschach()
-        self.can.create_rectangle(col * self.BOARD_WIDTH + self.rand,
-                                  line * self.BOARD_WIDTH + self.rand,
-                                  (col + 1) * self.BOARD_WIDTH + self.rand,
-                                  (line + 1) * self.BOARD_WIDTH + self.rand, fill=c_oval)
-        # print("rectangle position color: ", col, line, c_oval)
+            print("played move player : ", self.played_move_player)
+            # remove the highlight from the possible square
+            self.removeSelectionFromOthers_bauernschach()
+            self.draw_rectangle(col, line, c_oval, 0)
+            # draw a new oval in the played square
+            t = self.BOARD_WIDTH / 5
+            obj1 = self.can.create_oval(col * self.BOARD_WIDTH + t + self.rand, line * self.BOARD_WIDTH + t + self.rand,
+                                        (col + 1) * self.BOARD_WIDTH - t + self.rand,
+                                        (line + 1) * self.BOARD_WIDTH - t + self.rand, fill='red')
+            self.can.tag_bind(obj1, "<Button-1>", self.show_possible_moves_bauernschach)
+            # remove the old oval from the last position
 
-        # draw a new oval in the played square
-        t = self.BOARD_WIDTH / 5
-        obj1 = self.can.create_oval(col * self.BOARD_WIDTH + t + self.rand, line * self.BOARD_WIDTH + t + self.rand,
-                                    (col + 1) * self.BOARD_WIDTH - t + self.rand,
-                                    (line + 1) * self.BOARD_WIDTH - t + self.rand, fill='red')
-        self.can.tag_bind(obj1, "<Button-1>", self.show_possible_moves_bauernschach)
-        # remove the old oval from the last position
-
-        self.can.create_rectangle(self.played_move_player[0][0] * self.BOARD_WIDTH + self.rand,
-                                  self.played_move_player[0][1] * self.BOARD_WIDTH + self.rand,
-                                  (self.played_move_player[0][0] + 1) * self.BOARD_WIDTH + self.rand,
-                                  (self.played_move_player[0][1] + 1) * self.BOARD_WIDTH + self.rand, fill=c_rectangle)
-        # print("rectangle position color: ", self.played_move_player[0][0], self.played_move_player[0][1], c_rectangle)
-        # print("KI PAWNS POSITION ", self.KI_pawns_position)
-        if self.is_position_free_from_KI_pawns(col, line) == FALSE:
-            self.KI_pawns_position[col] = ([col, -10])
-
-        # initialise the last selected Square
-        self.last_selected = [-1, -1]
-        line = line + 1
-        # modify the player's pawn position
-
-        self.player_pawns_position[self.played_move_player[0][0]] = [self.played_move_player[1][0],
-                                                                     self.played_move_player[1][1]]
-        # TODO modify the position of KI_pawns and player_pawns
-        count = 0
-        for x in self.player_pawns_position:
-            if x == self.played_move_player[0]:
-                self.player_pawns_position[count] = self.played_move_player[0]
-                break
-            count = count + 1
-
-        print("PLAYER PAWNS POSITION ", self.player_pawns_position)
-        if line - 1 == 0:
-            print("**************** YOU WIN ***********************")
-        else:
-            self.best_move_bauernschach()
+            self.draw_rectangle(self.played_move_player[0][0], self.played_move_player[0][1], c_rectangle, 0)
+            for x in self.KI_pawns_position:
+                if x == self.played_move_player[1]:
+                    self.KI_pawns_position.remove(self.played_move_player[1])
+            print("new KI position ", self.KI_pawns_position)
+            # initialise the last selected Square
+            self.last_selected = [-1, -1]
+            line = line + 1
+            # modify the player's pawn position
+            self.player_pawns_position.remove(self.played_move_player[0])
+            self.player_pawns_position.append(self.played_move_player[1])
+            count = 0
+            for x in self.player_pawns_position:
+                if x == self.played_move_player[0]:
+                    self.player_pawns_position[count] = self.played_move_player[0]
+                    break
+                count = count + 1
+            if line - 1 == 0:
+                print("**************** YOU WIN ***********************")
+                self.game_state = self.GAME_OVER
+                messagebox.showinfo("Basic Example", "YOU WIN")
+            else:
+                self.best_move_bauernschach()
 
     def is_position_free_from_KI_pawns(self, a, b):
         for x in self.KI_pawns_position:
@@ -331,17 +305,12 @@ class Bauernschach():
         for pos in self.KI_pawns_position:
             col = pos[0]
             line = pos[1]
-            if line != -10:
-                if self.is_position_free_bauernschach(col, line + 1) == TRUE:
-                    KI_possible_moves_bauernschach.append([col, line, col, line + 1])
-                ### TODO check the position of the player's pawns
-                if self.is_position_free_from_player_pawns(col + 1, line + 1) == FALSE:
-                    print("KI position is free : ", col + 1, line + 1)
-                    KI_possible_moves_bauernschach.append([col, line, col + 1, line + 1])
-                if self.is_position_free_from_player_pawns(col - 1, line + 1) == FALSE:
-                    print("KI position is free : ", col - 1, line + 1)
-                    KI_possible_moves_bauernschach.append([col, line, col - 1, line + 1])
-        # print("possible move are : ", KI_possible_moves_bauernschach)
+            if self.is_position_free_bauernschach(col, line + 1) == TRUE:
+                KI_possible_moves_bauernschach.append([col, line, col, line + 1])
+            if self.is_position_free_from_player_pawns(col + 1, line + 1) == FALSE:
+                KI_possible_moves_bauernschach.append([col, line, col + 1, line + 1])
+            if self.is_position_free_from_player_pawns(col - 1, line + 1) == FALSE:
+                KI_possible_moves_bauernschach.append([col, line, col - 1, line + 1])
         return KI_possible_moves_bauernschach
 
     def KI_move_bauernschach(self, difficulty):
@@ -360,14 +329,19 @@ class Bauernschach():
             self.play_KI_move_bauernschach(cur_x, cur_y, next_x, next_y)
         else:
             print("********************* YOU LOSE (no possible moves) *************************")
+            self.game_state = self.GAME_OVER
+            messagebox.showinfo("Basic Example", "YOU LOSE")
+
+    def draw_rectangle(self, col, line, color, t):
+        self.can.create_rectangle(col * self.BOARD_WIDTH + t + self.rand, line * self.BOARD_WIDTH + t + self.rand,
+                                  (col + 1) * self.BOARD_WIDTH - t + self.rand,
+                                  (line + 1) * self.BOARD_WIDTH - t + self.rand, fill=color)
 
     def play_KI_move_bauernschach(self, cur_x, cur_y, next_x, next_y):
         col = next_x
         line = next_y
         self.last_selected[0] = cur_x
         self.last_selected[1] = cur_y
-        # store the played move  [0] ::> old position [1] ::> new position
-        # self.played_move = [[self.last_selected[0], self.last_selected[1]], [col, line]]
         self.played_move_KI = [[self.last_selected[0], self.last_selected[1]], [col, line]]
         print("KI last played move : ", self.played_move_KI)
         if (self.last_selected[0] + self.last_selected[1]) % 2 == 0:
@@ -380,24 +354,12 @@ class Bauernschach():
         else:
             c_oval = 'white'
 
-        # print("the played move col   line  ", col, line)
-        # remove the highlight from the possible square
-        self.can.create_rectangle(col * self.BOARD_WIDTH + self.rand, line * self.BOARD_WIDTH + self.rand,
-                                  (col + 1) * self.BOARD_WIDTH + self.rand,
-                                  (line + 1) * self.BOARD_WIDTH + self.rand, fill=c_oval)
-        # print("draw rectangle [new position] col line: ", col, line, c_oval)
+        self.draw_rectangle(col, line, c_oval, 0)
         # draw a new oval in the played square
         t = self.BOARD_WIDTH / 5
-        self.can.create_rectangle(col * self.BOARD_WIDTH + t + self.rand, line * self.BOARD_WIDTH + t + self.rand,
-                                  (col + 1) * self.BOARD_WIDTH - t + self.rand,
-                                  (line + 1) * self.BOARD_WIDTH - t + self.rand, fill='yellow')
-
+        self.draw_rectangle(col, line, 'yellow', t)
         # remove the old oval from the last position
-
-        self.can.create_rectangle(cur_x * self.BOARD_WIDTH + self.rand, cur_y * self.BOARD_WIDTH + self.rand,
-                                  (cur_x + 1) * self.BOARD_WIDTH + self.rand,
-                                  (cur_y + 1) * self.BOARD_WIDTH + self.rand, fill=c_rectangle)
-        # print("draw rectangle col line: ", col, line, c_rectangle)
+        self.draw_rectangle(cur_x, cur_y, c_rectangle, self.rand)
 
         # initialise the last selected Square
         self.last_selected = [-1, -1]
@@ -407,35 +369,22 @@ class Bauernschach():
             print("player_pawns_position: ", self.player_pawns_position,
                   " played move KI ",
                   self.played_move_KI[1])
-            for position in self.player_pawns_position:
-                if position == self.played_move_KI[1]:
-                    print("player_pawns_position: ", self.player_pawns_position,
-                          " played move KI ",
-                          self.played_move_KI[1], "position ", position, "count ", count)
-                    self.player_pawns_position[count] = [-10, -10]
-                count = count + 1
+            for x in self.player_pawns_position:
+                if x == self.played_move_KI[1]:
+                    self.player_pawns_position.remove(self.played_move_KI[1])
         count = 0
         print("player_pawns_position: ", self.player_pawns_position)
-        # modify the player's pawn position
-        for position in self.player_pawns_position:
-            if position == self.played_move_KI[0]:
-                print("position in KI_pawns_position: ", position, self.KI_pawns_position, " played move KI ",
-                      self.played_move_KI)
-                self.KI_pawns_position[count] = self.played_move_KI[1]
-                count = count + 1
-
-        ########################################################
-        if cur_x != col:
-            print(cur_x, col, line)
-            self.KI_pawns_position[cur_x] = [col, line]
-        else:
-            # modify the player's pawn position
-            self.KI_pawns_position[col] = [col, line]
-        ##############################################################
+        # modify the KI's pawn position
+        self.KI_pawns_position.remove(self.played_move_KI[0])
+        self.KI_pawns_position.append(self.played_move_KI[1])
 
         print("KI PAWNS POSITION", self.KI_pawns_position)
         if self.KI_possible_move_bauernschach() == []:
             print("draw!!!!")
+            self.game_state = self.GAME_OVER
+            messagebox.showinfo("Basic Example", "DRAW")
         elif self.played_move_KI[1][1] == self.BOARD_SIZE - 1:
             print("******************* YOU LOSE *****************************")
+            self.game_state = self.GAME_OVER
+            messagebox.showinfo("Basic Example", "YOU LOSE")
         print("*************************************************************")
