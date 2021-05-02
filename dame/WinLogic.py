@@ -21,7 +21,6 @@ class WinLogic:
              self.__is_player_out_of_queens(board, self.__ai_player) or \
              self.__is_player_out_of_moves(board, self.__ai_player):
                 winner = self.__human_player
-
         return winner
 
 
