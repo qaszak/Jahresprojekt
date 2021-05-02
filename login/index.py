@@ -32,24 +32,24 @@ class Window:
 
     def play_easy(self):
         self.difficulty = self.EASY
-        self.play(self.difficulty)
+        self.play()
 
     def play_normal(self):
         self.difficulty = self.NORMAL
-        self.play(self.difficulty)
+        self.play()
 
     def play_hard(self):
         self.difficulty = self.HARD
-        self.play(self.difficulty)
+        self.play()
 
-    def play(self, difficulty):
+    def play(self):
         if self.game == self.PAWN_CHESS:
-            self.play_pawnchess(difficulty)
+            self.play_pawnchess(self.difficulty)
 
     def play_pawnchess(self, difficulty):
         db = DB()
         db.add_player_stats(self.login, self.game, self.difficulty)
-        Play_bauernschach(self.window)
+        Play_bauernschach(self.window, difficulty)
 
     def register_btn_clicked(self):
         username = self.username_entry.get()

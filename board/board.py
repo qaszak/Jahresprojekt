@@ -8,7 +8,7 @@ from dame.dame_logic import Dame
 
 class Board:
 
-    def __init__(self, master, spiel):
+    def __init__(self, master, spiel, difficulty):
         self.master = master
         self.WINDOW_WIDTH = 800
         self.WINDOW_HEIGHT = 600
@@ -30,9 +30,9 @@ class Board:
         # self.can = Canvas(self.master, width=self.PAGE_WIDTH, heigh=self.PAGE_HEIGHT, bg='ivory')
         self.can = self.background()
         self.background()
-        #b1 = Button(self.master, text='Play now', command=self.board)
-        #b1.pack(side=RIGHT, padx=3, pady=3)
-        self.board()
+        # b1 = Button(self.master, text='Play now', command=self.board)
+        # b1.pack(side=RIGHT, padx=3, pady=3)
+        self.board(difficulty)
         # bauern = Bauernschach(self.can, self.BOARD_WIDTH, self.BOARD_SIZE, self.rand)
         # b4 = Button(master, text='back', command=bauern.back())
         # b4.pack(side=RIGHT, padx=3, pady=3)
@@ -84,7 +84,7 @@ class Board:
         return window_background
 
     # create an empty board
-    def board(self):
+    def board(self, difficulty):
         ite, i = 0, 1
 
         while self.x1 < self.BOARD_WIDTH * self.BOARD_SIZE and self.y1 < self.BOARD_WIDTH * self.BOARD_SIZE:
@@ -99,7 +99,7 @@ class Board:
                 self.color = self.COLOR1
 
         if self.spiel == "bauernschach":
-            bauernschach = Bauernschach(self.can, self.BOARD_WIDTH, self.BOARD_SIZE, self.rand)
+            bauernschach = Bauernschach(self.can, self.BOARD_WIDTH, self.BOARD_SIZE, self.rand, difficulty)
             bauernschach.fill_board_pawns()
         elif self.spiel == "dame":
             dame = Dame(self.can, self.BOARD_WIDTH, self.BOARD_SIZE, self.rand)

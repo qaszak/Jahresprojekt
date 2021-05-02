@@ -1,10 +1,15 @@
+from copy import deepcopy
 from random import choice
 from tkinter import *
 from tkinter import messagebox
 
 
 class Bauernschach():
-    def __init__(self, can, B_W, B_S, rand):
+    def __init__(self, can, B_W, B_S, rand, difficulty):
+        self.difficulty = difficulty
+        self.EASY = "easy"
+        self.NORMAL = "normal"
+        self.HARD = "hard"
         self.game_state = None
         self.GAME_OVER = "GAME OVER"
         # the highlighted square
@@ -61,6 +66,7 @@ class Bauernschach():
 
     def fill_board_pawns(self):
         print("draw pawns")
+        self.difficulty = self.NORMAL
         self.fill_board_player_pawns()
         self.fill_board_KI_pawns()
 
@@ -286,46 +292,133 @@ class Bauernschach():
                 return FALSE
         return TRUE
 
-    def is_position_free_from_player_pawns(self, a, b):
-        for x in self.player_pawns_position:
+    def is_position_free_from_player_pawns(self, a, b, player_pawns_position):
+        for x in player_pawns_position:
             if x[0] == a and x[1] == b:
                 return FALSE
         return TRUE
 
-    def is_position_free_bauernschach(self, a, b):
-        all_pawns = self.KI_pawns_position + self.player_pawns_position
-        for x in all_pawns:
-            if x[0] == a and x[1] == b:
+    def is_position_free_bauernschach(self, a, b, KI_pawns_position, player_pawns_position):
+        all_pawns = KI_pawns_position + player_pawns_position
+        for z in all_pawns:
+            if z[0] == a and z[1] == b:
                 return FALSE
         return TRUE
 
-    ##  return all possible moves [0]and[1] are the current position [2]and[3] the possible move
-    def KI_possible_move_bauernschach(self):
-        KI_possible_moves_bauernschach = []
-        for pos in self.KI_pawns_position:
+    def player_possible_move_bauernschach(self, KI_pawns_position, player_pawns_position):
+        player_possible_moves_bauernschach = []
+        for pos in player_pawns_position:
             col = pos[0]
             line = pos[1]
-            if self.is_position_free_bauernschach(col, line + 1) == TRUE:
+            if self.is_position_free_bauernschach(col, line - 1, KI_pawns_position, player_pawns_position) == TRUE:
+                player_possible_moves_bauernschach.append([col, line, col, line - 1])
+            if self.is_position_free_from_KI_pawns(col + 1, line - 1) == FALSE:
+                player_possible_moves_bauernschach.append([col, line, col + 1, line - 1])
+            if self.is_position_free_from_KI_pawns(col - 1, line - 1) == FALSE:
+                player_possible_moves_bauernschach.append([col, line, col - 1, line - 1])
+        return player_possible_moves_bauernschach
+
+    def play_possible_move_player_bauernschach(self, KI_pawns_position, player_pawns_position):
+        all_moves = []
+        for x in self.player_possible_move_bauernschach(KI_pawns_position, player_pawns_position):
+            cur_position = [x[0], x[1]]
+            new_move = [x[2], x[3]]
+            player_position = deepcopy(player_pawns_position)
+            player_position.remove(cur_position)
+            player_position.append(new_move)
+            all_moves.append(player_position)
+        return all_moves
+
+    ##  return all possible moves [0]and[1] are the current position [2]and[3] the possible move
+    def KI_possible_move_bauernschach(self, KI_pawns_position, player_pawns_position):
+        KI_possible_moves_bauernschach = []
+        for pos in KI_pawns_position:
+            col = pos[0]
+            line = pos[1]
+            if self.is_position_free_bauernschach(col, line + 1, KI_pawns_position, player_pawns_position) == TRUE:
                 KI_possible_moves_bauernschach.append([col, line, col, line + 1])
-            if self.is_position_free_from_player_pawns(col + 1, line + 1) == FALSE:
+            if self.is_position_free_from_player_pawns(col + 1, line + 1, player_pawns_position) == FALSE:
                 KI_possible_moves_bauernschach.append([col, line, col + 1, line + 1])
-            if self.is_position_free_from_player_pawns(col - 1, line + 1) == FALSE:
+            if self.is_position_free_from_player_pawns(col - 1, line + 1, player_pawns_position) == FALSE:
                 KI_possible_moves_bauernschach.append([col, line, col - 1, line + 1])
+        # print("KI POSSIBLE MOVES ", KI_possible_moves_bauernschach)
         return KI_possible_moves_bauernschach
 
+    def play_possible_move_KI_bauernschach(self, KI_pawns_position, player_pawns_position):
+        all_moves = []
+
+        for x in self.KI_possible_move_bauernschach(KI_pawns_position, player_pawns_position):
+            KI_position = deepcopy(KI_pawns_position)
+            cur_position = [x[0], x[1]]
+            new_move = [x[2], x[3]]
+            KI_position.remove(cur_position)
+            KI_position.append(new_move)
+            # print("KI pawns 1 ", KI_position)
+            all_moves.append(KI_position)
+        return all_moves
+
     def KI_move_bauernschach(self, difficulty):
-        self.KI_pawns_position
         self.best_move_bauernschach(difficulty)
+
+    def evaluate(self, KI_pawns_position, player_pawns_position):
+        # print(" evalute KI POSITION ",KI_pawns_position)
+        # print(" evalute PLAYER POSITION ", player_pawns_position)
+        return len(KI_pawns_position) - len(player_pawns_position)
+
+    def minimax(self, KI_positions, player_positions, depth, state, max_player):
+        if depth == 0 or state == self.GAME_OVER:
+            return self.evaluate(KI_positions, player_positions), KI_positions, player_positions, state
+        if max_player:
+            max_eval = -1000
+            best_move = None
+            ## all possible moves [0]and[1] are the current position [2]and[3] the possible move
+            for move_KI in self.play_possible_move_KI_bauernschach(KI_positions, player_positions):
+                eval = self.minimax(move_KI, player_positions, depth - 1, state,
+                                    FALSE)[0]  ## how do i know the state here???
+                max_eval = max(max_eval, eval)
+                if max_eval == eval:
+                    best_move = move_KI
+            return max_eval, best_move
+        else:
+            min_eval = 1000
+            best_move = None
+            ## all possible moves [0]and[1] are the current position [2]and[3] the possible move
+            for move_player in self.play_possible_move_player_bauernschach(KI_positions, player_positions):
+                eval = self.minimax(KI_positions, move_player, depth - 1, state,
+                                    TRUE)[0]  ## how do i know the state here???
+                min_eval = min(min_eval, eval)
+                if min_eval == eval:
+                    best_move = move_player
+            return min_eval, best_move
 
     def best_move_bauernschach(self):
         # TODO MiniMax
-        KI_possible_moves_bauernschach = self.KI_possible_move_bauernschach()
+        KI_positions = deepcopy(self.KI_pawns_position)
+        player_positions = deepcopy(self.player_pawns_position)
+        state = deepcopy(self.game_state)
+        if self.difficulty == self.HARD:
+            depth = 6
+        elif self.difficulty == self.NORMAL:
+            depth = 4
+        elif self.difficulty == self.EASY:
+            depth = 2
+        max_player = TRUE
+
+        KI_possible_moves_bauernschach = self.minimax(KI_positions, player_positions, depth, state, max_player)[1]
+        copy_ki_pawns_position = deepcopy(self.KI_pawns_position)
         if KI_possible_moves_bauernschach != []:
-            move = choice(KI_possible_moves_bauernschach)
-            cur_x = move[0]
-            cur_y = move[1]
-            next_x = move[2]
-            next_y = move[3]
+            for x in self.KI_pawns_position:
+                for y in KI_possible_moves_bauernschach:
+                    if x == y:
+                        KI_possible_moves_bauernschach.remove(y)
+                        copy_ki_pawns_position.remove(x)
+                        break
+
+            next_x = KI_possible_moves_bauernschach[0][0]
+            next_y = KI_possible_moves_bauernschach[0][1]
+            cur_x = copy_ki_pawns_position[0][0]
+            cur_y = copy_ki_pawns_position[0][1]
+            # move = choice(KI_possible_moves_bauernschach)
             self.play_KI_move_bauernschach(cur_x, cur_y, next_x, next_y)
         else:
             print("********************* YOU LOSE (no possible moves) *************************")
@@ -343,7 +436,7 @@ class Bauernschach():
         self.last_selected[0] = cur_x
         self.last_selected[1] = cur_y
         self.played_move_KI = [[self.last_selected[0], self.last_selected[1]], [col, line]]
-        print("KI last played move : ", self.played_move_KI)
+        # print("KI last played move : ", self.played_move_KI)
         if (self.last_selected[0] + self.last_selected[1]) % 2 == 0:
             c_rectangle = 'grey'
         else:
@@ -366,20 +459,24 @@ class Bauernschach():
         ########################################################
         if self.played_move_KI[0][0] != self.played_move_KI[1][0]:
             count = 0
-            print("player_pawns_position: ", self.player_pawns_position,
-                  " played move KI ",
-                  self.played_move_KI[1])
+            # print("player_pawns_position: ", self.player_pawns_position,
+            #      " played move KI ",
+            #      self.played_move_KI[1])
             for x in self.player_pawns_position:
                 if x == self.played_move_KI[1]:
                     self.player_pawns_position.remove(self.played_move_KI[1])
         count = 0
-        print("player_pawns_position: ", self.player_pawns_position)
+        # print("player_pawns_position: ", self.player_pawns_position)
         # modify the KI's pawn position
         self.KI_pawns_position.remove(self.played_move_KI[0])
         self.KI_pawns_position.append(self.played_move_KI[1])
 
         print("KI PAWNS POSITION", self.KI_pawns_position)
-        if self.KI_possible_move_bauernschach() == []:
+        if len(self.KI_pawns_position) == 0:
+            print("draw!!!!")
+            self.game_state = self.GAME_OVER
+            messagebox.showinfo("Basic Example", "YOU WIN")
+        if self.KI_possible_move_bauernschach(self.KI_pawns_position, self.player_pawns_position) == []:
             print("draw!!!!")
             self.game_state = self.GAME_OVER
             messagebox.showinfo("Basic Example", "DRAW")
