@@ -27,10 +27,21 @@ class DameLogic:
                      [__EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER],
                      [__EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER],
                      [__HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER]]
+    """
+    __START_BOARD = [[__EMPTY_TILE_CHARACTER, __AI_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER],
+                     [__EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __AI_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER],
+                     [__EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER],
+                     [__HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER]]
+    """
 
 
     def __init__(self):
         self.__initialize_board(self.__START_BOARD)
+
+
+    # TEMPORARY - DELETE LATER
+    def get_board(self):
+        return self.__board
 
 
     # public methods
@@ -38,26 +49,36 @@ class DameLogic:
         moves = []
         if board is None:
             board = self.__board
-        queen = self.__get_queen_at(row, column)
+        queen = board.get_tile(row, column)
         if queen is not None:
-            if (not check_possible_in_turn) or (check_possible_in_turn and self.__is_players_turn(queen)):
+            if (not check_possible_in_turn) or (check_possible_in_turn and self.__is_players_turn(queen, board)):
                 moves = self.__movement_logic.get_moves_for(board, queen, check_possible_in_turn)
         return moves
 
 
-    def get_winner(self):
-        winner = self.__win_logic.get_winner(self.__board)
+    def is_game_over(self, board=None):
+        if board is None:
+            board = self.__board
+        return self.get_winner(board) != ""
+
+
+    def get_winner(self, board=None):
+        if board is None:
+            board = self.__board
+        winner = self.__win_logic.get_winner(board)
         return self.__get_player_name(winner)
 
 
-    def get_external_board(self):
-        board = self.__board.get_board_representation(self.__EMPTY_TILE_CHARACTER)
-        score = self.__board.get_score()
-        name_player_turn = self.__get_player_name(self.__board.get_player_turn())
-        character_player_turn = self.__get_player_character(self.__board.get_player_turn())
-        number_of_queens_ai = len(self.__board.get_queens_for(self.__AI_PLAYER))
-        number_of_queens_human = len(self.__board.get_queens_for(self.__HUMAN_PLAYER))
-        return ExternalDameBoard.ExternalDameBoard(board, score, self.__NAME_AI_PLAYER, self.__NAME_HUMAN_PLAYER,
+    def get_external_board(self, board=None):
+        if board is None:
+            board = self.__board
+        board_representation = board.get_board_representation(self.__EMPTY_TILE_CHARACTER)
+        score = board.get_score()
+        name_player_turn = self.__get_player_name(board.get_player_turn())
+        character_player_turn = self.__get_player_character(board.get_player_turn())
+        number_of_queens_ai = len(board.get_queens_for(self.__AI_PLAYER))
+        number_of_queens_human = len(board.get_queens_for(self.__HUMAN_PLAYER))
+        return ExternalDameBoard.ExternalDameBoard(board_representation, score, self.__NAME_AI_PLAYER, self.__NAME_HUMAN_PLAYER,
                                                    name_player_turn, character_player_turn, number_of_queens_ai,
                                                    number_of_queens_human, self.__AI_QUEEN_CHARACTER,
                                                    self.__HUMAN_QUEEN_CHARACTER, self.__EMPTY_TILE_CHARACTER)
@@ -79,7 +100,7 @@ class DameLogic:
                 board.increment_score_by(10)
             if len(self.__movement_logic.get_moves_for(board, move.get_queen())) == 0:
                 board.close_turn()
-                self.__switch_player_turn()
+                self.__switch_player_turn(board)
 
 
     def get_opponent(self, player):
@@ -91,9 +112,9 @@ class DameLogic:
         PARSE_BOARD = True
         IN_TURN_PREVIOUSLY_MOVED_QUEEN = None
         self.__board = InternalDameBoard.InternalDameBoard(board, PARSE_BOARD, IN_TURN_PREVIOUSLY_MOVED_QUEEN,
-                                                           self.__AI_PLAYER, self.__HUMAN_PLAYER,
+                                                           self.__PLAYER_FIRST_MOVE, self.__AI_PLAYER, self.__HUMAN_PLAYER,
                                                            self.__AI_QUEEN_CHARACTER, self.__HUMAN_QUEEN_CHARACTER,
-                                                           self.__EMPTY_TILE_CHARACTER, self.__PLAYER_FIRST_MOVE)
+                                                           self.__EMPTY_TILE_CHARACTER,)
         self.__movement_logic = MovementLogic.MovementLogic(self.__AI_PLAYER, self.__HUMAN_PLAYER)
         self.__win_logic = WinLogic.WinLogic(self, self.__AI_PLAYER, self.__HUMAN_PLAYER)
 
@@ -119,8 +140,10 @@ class DameLogic:
         return self.__board.get_tile(row, column)
 
 
-    def __is_players_turn(self, queen):
-        return self.__board.get_player_turn() == queen.get_player()
+    def __is_players_turn(self, queen, board=None):
+        if board is None:
+            board = self.__board
+        return board.get_player_turn() == queen.get_player()
 
 
     def __switch_player_turn(self, board):
