@@ -10,8 +10,8 @@ class InternalDameBoard:
     __player_turn = -1
     __in_turn_previously_moved_queen = None
 
-    def __init__(self, board, parse, in_turn_previously_moved_queen, ai_player="", human_player="",
-                 ai_queen_character="", human_queen_character="", empty_tile_character="", player_first_move=""):
+    def __init__(self, board, parse, in_turn_previously_moved_queen, player_first_move, ai_player="", human_player="",
+                 ai_queen_character="", human_queen_character="", empty_tile_character=""):
         if parse:
             self.__parse_board(board, ai_player, human_player, ai_queen_character, human_queen_character, empty_tile_character)
         else:
@@ -22,12 +22,13 @@ class InternalDameBoard:
 
 
     def clone(self):
-        clone_in_turn_previouslsy_moved_queen = None
+        clone_in_turn_previously_moved_queen = None
         if self.__in_turn_previously_moved_queen is not None:
-            clone_in_turn_previouslsy_moved_queen = self.__in_turn_previously_moved_queen.clone()
-        clone = InternalDameBoard(self.__get_clone_of_board(), False, clone_in_turn_previouslsy_moved_queen)
+            clone_in_turn_previously_moved_queen = self.__in_turn_previously_moved_queen.clone()
+        clone = InternalDameBoard(self.__get_clone_of_board(), False, clone_in_turn_previously_moved_queen, self.get_player_turn())
         clone.set_score(self.get_score())
         clone.set_player_turn(self.get_player_turn())
+        return clone
 
 
     def set_player_turn(self, player):
@@ -136,7 +137,7 @@ class InternalDameBoard:
         clone = [[None for columns in board_range] for rows in board_range]
         for row in board_range:
             for column in board_range:
-                queen = self.__board[row][column]
+                queen = self.get_tile(row, column)
                 if queen is not None:
                     clone[row][column] = queen.clone()
         return clone
