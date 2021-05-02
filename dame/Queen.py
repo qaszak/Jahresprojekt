@@ -13,7 +13,7 @@ class Queen:
 
 
     def clone(self):
-        return Queen(self.get_row(), self.get_column(), self.get_player(), self.get_player())
+        return Queen(self.get_row(), self.get_column(), self.get_player(), self.get_character())
 
 
     def set_position(self, row, column):
