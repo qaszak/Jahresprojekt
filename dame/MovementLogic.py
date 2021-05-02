@@ -16,7 +16,7 @@ class MovementLogic:
         if not check_possible_in_turn:
             moves = self.__get_possible_moves_for(board, queen)
         elif self.__is_new_turn(board) or self.__is_already_moved_in_turn(board, queen):
-            hitting_moves = self.__get_hitting_moves_for_player(board, queen)
+            hitting_moves = self.__get_hitting_moves_for_player(board, queen.get_player())
             if self.__is_already_moved_in_turn(board, queen) or len(hitting_moves) > 0:
                 moves = self.__select_hitting_moves_for_queen_from(hitting_moves, queen)
             else:
@@ -46,9 +46,9 @@ class MovementLogic:
         return board.get_in_turn_previously_moved_queen() is None
 
 
-    def __get_hitting_moves_for_player(self,board, queen):
+    def __get_hitting_moves_for_player(self, board, player):
         hitting_moves = []
-        for queen in board.get_queens_for(queen.get_player()):
+        for queen in board.get_queens_for(player):
             for move in self.__get_possible_moves_for(board, queen):
                 if self.__is_hitting_move(board, move):
                     hitting_moves.append(move)
