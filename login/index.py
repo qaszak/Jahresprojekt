@@ -16,7 +16,7 @@ class Window:
         self.login = None
         self.game = None
         self.PAWN_CHESS = "bauernschach"
-        self.DAME = "dame"
+        self.DAME = "dame2"
         self.TIC_TAC_TAE = "tic-tac-toe"
         self.difficulty = None
         self.EASY = "easy"

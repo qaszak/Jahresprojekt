@@ -1,5 +1,7 @@
+from dame import Dame
 
-class Dame():
+
+class Dame_logic():
     def __init__(self, can, B_W, B_S, rand):
         # the highlighted square
         self.highlighted_square = []
@@ -17,7 +19,7 @@ class Dame():
         self.BOARD_WIDTH = B_W
         self.BOARD_SIZE = B_S
         self.rand = rand
-        self.spiel = "dame"
+        self.spiel = "dame2"
         self.last_selected = [0, 0]
         size = 6
         # player and ki pawns position [column , line]
@@ -105,7 +107,9 @@ class Dame():
                                                           self.BOARD_SIZE - 1) - self.BOARD_WIDTH / 5 + self.rand
         i = 0
         while i < self.BOARD_SIZE:
-            self.can.create_oval(self.x3, self.x4, self.y3, self.y4, fill='red')
+           #dame=Dame()
+            obj1=self.can.create_oval(self.x3, self.x4, self.y3, self.y4, fill='red')
+            #self.can.tag_bind(obj1, "<Button-1>", dame.get_possible_moves_for)
             i, ite, self.x3, self.x4, self.y3, self.y4 = i + 1, ite + 2, self.x3 + self.BOARD_WIDTH * 2, \
                                                          self.x4, self.y3 + self.BOARD_WIDTH * 2, self.y4
             if ite == 6:

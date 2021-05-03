@@ -361,8 +361,6 @@ class Bauernschach():
         self.best_move_bauernschach(difficulty)
 
     def evaluate(self, KI_pawns_position, player_pawns_position):
-        # print(" evalute KI POSITION ",KI_pawns_position)
-        # print(" evalute PLAYER POSITION ", player_pawns_position)
         return len(KI_pawns_position) - len(player_pawns_position)
 
     def minimax(self, KI_positions, player_positions, depth, state, max_player):

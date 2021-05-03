@@ -100,7 +100,7 @@ class DB:
     def get_best_list(self, game):
         if game == "pawnchess":
             return self.get_pawn_chess_best_list()
-        if game == "dame":
+        if game == "dame2":
             return self.get_dame_best_list()
         if game == "tic-tac-toe":
             return self.get_tic_tac_toe_best_list()
@@ -145,7 +145,7 @@ class DB:
     def set_score(self, login, game, score):
         if game == "pawnchess":
             return self.set_pawn_chess_score(login, score)
-        if game == "dame":
+        if game == "dame2":
             return self.set_dame_score(login, score)
         if game == "tic-tac-toe":
             return self.set_tic_tac_toe_score(login, score)
@@ -219,9 +219,9 @@ db = DB()
 #for row in rows:
  #   print(row)
 # db.add_best_list("zak")
-#db.set_score("zak", "dame", 10)
+#db.set_score("zak", "dame2", 10)
 
-print("best_list_dame ", db.get_best_list("dame"))
+print("best_list_dame ", db.get_best_list("dame2"))
 print("best_list_pawn ", db.get_best_list("pawnchess"))
 print("best_list_tic ", db.get_best_list("tic-tac-toe"))
 #print(db.find_user("zak"))

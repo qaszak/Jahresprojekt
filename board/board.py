@@ -3,7 +3,7 @@
 ##############                    #################
 
 from bauernschach.bauernschach_logic import *
-from dame.dame_logic import Dame
+from dame2.dame_logic import Dame_logic
 
 
 class Board:
@@ -14,8 +14,8 @@ class Board:
         self.WINDOW_HEIGHT = 600
         ###  CHANGE SIZE OF THE BOARD AND THE WIDTH OF THE CASES HERE ###
         ###################
-        self.spiel = spiel  ### which game bauernschach,dame, tic-tac-toe?
-        self.BOARD_SIZE = 6  #
+        self.spiel = spiel  ### which game bauernschach,dame2, tic-tac-toe?
+        self.BOARD_SIZE = 6 #
         self.BOARD_WIDTH = 90  #
         self.PAGE_WIDTH = 800  #
         self.PAGE_HEIGHT = 600  #
@@ -102,7 +102,7 @@ class Board:
             bauernschach = Bauernschach(self.can, self.BOARD_WIDTH, self.BOARD_SIZE, self.rand, difficulty)
             bauernschach.fill_board_pawns()
         elif self.spiel == "dame":
-            dame = Dame(self.can, self.BOARD_WIDTH, self.BOARD_SIZE, self.rand)
+            dame = Dame_logic(self.can, self.BOARD_WIDTH, self.BOARD_SIZE, self.rand)
             dame.fill_board_queen()
 
     def quit(self):

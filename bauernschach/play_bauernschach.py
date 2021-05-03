@@ -8,5 +8,5 @@ class Play_bauernschach():
         # self.master.pack_forget()
         Board(page, spiel, difficulty)
 
-# page = Tk()
-# Play_bauernschach(page)
+#page = Tk()
+#Play_bauernschach(page,"normal")

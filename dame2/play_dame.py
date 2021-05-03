@@ -4,7 +4,7 @@ from board.board import Board, Tk
 class Test2():
     def __init__(self, master):
         spiel = "dame"
-        Board(master, spiel)
+        Board(master, spiel,"easy")
 
 
 
