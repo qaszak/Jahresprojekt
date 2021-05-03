@@ -3,7 +3,7 @@
 class AdapterPrint:
 
 
-    def get_print_of_board(self, external_board):
+    def format_board(self, external_board):
         output = "\n" + str(external_board.get_name_human()) + "\t\t\t" + str(external_board.get_name_ai()) + \
                  "\nQueens: " + str(external_board.get_number_of_queens_human()) + \
                  "\t\tQueens: " + str(external_board.get_number_of_queens_ai()) + \
@@ -13,7 +13,7 @@ class AdapterPrint:
         return output
 
 
-    def get_print_of_possible_moves(self, row, column, moves):
+    def format_possible_moves(self, row, column, moves):
         position = "(" + str(row) + "," + str(column) + ")"
         if len(moves) == 0:
             output = "\n\tNo moves possible for " + position
