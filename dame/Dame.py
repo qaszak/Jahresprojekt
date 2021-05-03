@@ -30,7 +30,8 @@ class Dame:
 
 
     def get_winner(self):
-        return self.__logic.get_winner()
+        winner = self.__logic.get_winner()
+        return self.__logic.get_player_name(winner)
 
 
     def execute_player_move_for(self, row, column):
