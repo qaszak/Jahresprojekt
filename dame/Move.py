@@ -17,3 +17,6 @@ class Move:
 
     def get_column(self):
         return self.__to_column
+
+    def clone(self):
+        return Move(self.__queen.clone(), self.get_row(), self.get_column())

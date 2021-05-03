@@ -1,6 +1,7 @@
 import InternalDameBoard
 import ExternalDameBoard
 import Queen
+import BoardEvaluationLogic
 import MovementLogic
 import WinLogic
 import Move
@@ -9,13 +10,14 @@ import Move
 class DameLogic:
 
     __board = None
+    __evaluation_logic = None
     __movement_logic = None
     __win_logic = None
-
     __BOARD_SIZE = 6
     __AI_PLAYER = 1
     __HUMAN_PLAYER = 2
-    __PLAYER_FIRST_MOVE = 2
+    #__PLAYER_FIRST_MOVE = 2
+    __PLAYER_FIRST_MOVE = 1
     __NAME_AI_PLAYER = "Computer"
     __NAME_HUMAN_PLAYER = "Player"
     __AI_QUEEN_CHARACTER = "B"
@@ -27,65 +29,113 @@ class DameLogic:
                      [__EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER],
                      [__EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER],
                      [__HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER]]
+    """
+    __START_BOARD = [[__EMPTY_TILE_CHARACTER, __AI_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER],
+                     [__EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __AI_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER],
+                     [__EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER],
+                     [__HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER]]
+
+    __START_BOARD = [[__EMPTY_TILE_CHARACTER, __AI_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER],
+                     [__EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __AI_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER],
+                     [__EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER],
+                     [__HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER]]
+    """
 
 
     def __init__(self):
         self.__initialize_board(self.__START_BOARD)
 
 
+    # TEMPORARY - DELETE LATER
+    def get_board(self):
+        return self.__board
+
+
     # public methods
-    def get_possible_moves_for(self, row, column, check_possible_in_turn = True):
+    def get_possible_moves_for(self, row, column, board=None, check_possible_in_turn = True):
         moves = []
-        queen = self.__get_queen_at(row, column)
+        if board is None:
+            board = self.__board
+        queen = board.get_tile(row, column)
         if queen is not None:
-            if (not check_possible_in_turn) or (check_possible_in_turn and self.__is_players_turn(queen)):
-                moves = self.__movement_logic.get_moves_for(queen, check_possible_in_turn)
+            if (not check_possible_in_turn) or (check_possible_in_turn and self.__is_players_turn(queen, board)):
+                moves = self.__movement_logic.get_moves_for(board, queen, check_possible_in_turn)
         return moves
 
 
-    def get_winner(self):
-        winner = self.__win_logic.get_winner()
-        return self.__get_player_name(winner)
+    def get_hitting_moves_for_player(self, board, player):
+        return self.__movement_logic.get_hitting_moves_for_player(board, player)
 
 
-    def get_external_board(self):
-        board = self.__board.get_board_representation(self.__EMPTY_TILE_CHARACTER)
-        score = self.__board.get_score()
-        name_player_turn = self.__get_player_name(self.__board.get_player_turn())
-        character_player_turn = self.__get_player_character(self.__board.get_player_turn())
-        number_of_queens_ai = len(self.__board.get_queens_for(self.__AI_PLAYER))
-        number_of_queens_human = len(self.__board.get_queens_for(self.__HUMAN_PLAYER))
-        return ExternalDameBoard.ExternalDameBoard(board, score, self.__NAME_AI_PLAYER, self.__NAME_HUMAN_PLAYER,
+    def evaluate_board(self, board, player):
+        return self.__evaluation_logic.evaluate(board, player)
+
+
+    def is_game_over(self, board=None):
+        if board is None:
+            board = self.__board
+        return self.get_winner(board) != -1
+
+
+    def get_winner(self, board=None):
+        if board is None:
+            board = self.__board
+        return self.__win_logic.get_winner(board)
+
+
+    def get_external_board(self, board=None):
+        if board is None:
+            board = self.__board
+        board_representation = board.get_board_representation(self.__EMPTY_TILE_CHARACTER)
+        score = board.get_score()
+        name_player_turn = self.get_player_name(board.get_player_turn())
+        character_player_turn = self.__get_player_character(board.get_player_turn())
+        number_of_queens_ai = len(board.get_queens_for(self.__AI_PLAYER))
+        number_of_queens_human = len(board.get_queens_for(self.__HUMAN_PLAYER))
+        return ExternalDameBoard.ExternalDameBoard(board_representation, score, self.__NAME_AI_PLAYER, self.__NAME_HUMAN_PLAYER,
                                                    name_player_turn, character_player_turn, number_of_queens_ai,
                                                    number_of_queens_human, self.__AI_QUEEN_CHARACTER,
                                                    self.__HUMAN_QUEEN_CHARACTER, self.__EMPTY_TILE_CHARACTER)
 
 
-    def execute_move(self, move):
-        hit_queen = self.__movement_logic.get_hit_queen(move)
+    def execute_move(self, move, board=None):
+        if board is None:
+            board = self.__board
+        hit_queen = self.__movement_logic.get_hit_queen(board, move)
         if hit_queen is None:
-            self.__board.execute_move(move)
-            self.__board.close_turn()
-            self.__switch_player_turn()
+            board.execute_move(move)
+            board.close_turn()
+            self.__switch_player_turn(board)
         else:
-            self.__board.update_turn(move)
-            self.__board.execute_move(move)
-            self.__board.remove_queen(hit_queen)
+            board.update_turn(move)
+            board.execute_move(move)
+            board.remove_queen(hit_queen)
             if self.__is_human_move(move):
-                self.__board.increment_score_by(10)
-            if len(self.__movement_logic.get_moves_for(move.get_queen())) == 0:
-                self.__board.close_turn()
-                self.__switch_player_turn()
+                board.increment_score_by(10)
+            if len(self.__movement_logic.get_moves_for(board, move.get_queen())) == 0:
+                board.close_turn()
+                self.__switch_player_turn(board)
 
+
+    def get_opponent(self, player):
+        return self.__HUMAN_PLAYER if player == self.__AI_PLAYER else self.__AI_PLAYER
+
+
+    def get_opponents_baseline_index(self, board, player):
+        return self.__win_logic.get_opponents_baseline_index(board, player)
 
 
     # private methods
     def __initialize_board(self, board):
-        self.__board = InternalDameBoard.InternalDameBoard(board, self.__AI_PLAYER, self.__HUMAN_PLAYER,
+        PARSE_BOARD = True
+        IN_TURN_PREVIOUSLY_MOVED_QUEEN = None
+        self.__board = InternalDameBoard.InternalDameBoard(board, PARSE_BOARD, IN_TURN_PREVIOUSLY_MOVED_QUEEN,
+                                                           self.__PLAYER_FIRST_MOVE, self.__AI_PLAYER, self.__HUMAN_PLAYER,
                                                            self.__AI_QUEEN_CHARACTER, self.__HUMAN_QUEEN_CHARACTER,
-                                                           self.__EMPTY_TILE_CHARACTER, self.__PLAYER_FIRST_MOVE)
-        self.__movement_logic = MovementLogic.MovementLogic(self.__board, self.__AI_PLAYER, self.__HUMAN_PLAYER)
-        self.__win_logic = WinLogic.WinLogic(self.__board, self, self.__AI_PLAYER, self.__HUMAN_PLAYER)
+                                                           self.__EMPTY_TILE_CHARACTER,)
+        self.__evaluation_logic = BoardEvaluationLogic.BoardEvaluationLogic(self)
+        self.__movement_logic = MovementLogic.MovementLogic(self.__AI_PLAYER, self.__HUMAN_PLAYER)
+        self.__win_logic = WinLogic.WinLogic(self, self.__AI_PLAYER, self.__HUMAN_PLAYER)
 
 
     def __is_human_move(self, move):
@@ -96,7 +146,7 @@ class DameLogic:
         return self.__AI_QUEEN_CHARACTER if player == self.__AI_PLAYER else self.__HUMAN_QUEEN_CHARACTER
 
 
-    def __get_player_name(self, player):
+    def get_player_name(self, player):
         output = ""
         if player == self.__AI_PLAYER:
             output = self.__NAME_AI_PLAYER
@@ -109,15 +159,17 @@ class DameLogic:
         return self.__board.get_tile(row, column)
 
 
-    def __is_players_turn(self, queen):
-        return self.__board.get_player_turn() == queen.get_player()
+    def __is_players_turn(self, queen, board=None):
+        if board is None:
+            board = self.__board
+        return board.get_player_turn() == queen.get_player()
 
 
-    def __switch_player_turn(self):
-        if self.__board.get_player_turn() == self.__AI_PLAYER:
-            self.__board.set_player_turn(self.__HUMAN_PLAYER)
+    def __switch_player_turn(self, board):
+        if board.get_player_turn() == self.__AI_PLAYER:
+            board.set_player_turn(self.__HUMAN_PLAYER)
         else:
-            self.__board.set_player_turn(self.__AI_PLAYER)
+            board.set_player_turn(self.__AI_PLAYER)
 
 
     ################### UNCOMMENT TO RUN TESTCASES.PY #######################

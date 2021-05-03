@@ -10,10 +10,25 @@ class InternalDameBoard:
     __player_turn = -1
     __in_turn_previously_moved_queen = None
 
-    def __init__(self, board, ai_player, human_player, ai_queen_character, human_queen_character, empty_tile_character, player_first_move):
-        self.__parse_board(board, ai_player, human_player, ai_queen_character, human_queen_character, empty_tile_character)
+    def __init__(self, board, parse, in_turn_previously_moved_queen, player_first_move, ai_player="", human_player="",
+                 ai_queen_character="", human_queen_character="", empty_tile_character=""):
+        if parse:
+            self.__parse_board(board, ai_player, human_player, ai_queen_character, human_queen_character, empty_tile_character)
+        else:
+            self.__board = board
         self.__initialize_queen_collection()
+        self.__in_turn_previously_moved_queen = in_turn_previously_moved_queen
         self.__player_turn = player_first_move
+
+
+    def clone(self):
+        clone_in_turn_previously_moved_queen = None
+        if self.__in_turn_previously_moved_queen is not None:
+            clone_in_turn_previously_moved_queen = self.__in_turn_previously_moved_queen.clone()
+        clone = InternalDameBoard(self.__get_clone_of_board(), False, clone_in_turn_previously_moved_queen, self.get_player_turn())
+        clone.set_score(self.get_score())
+        clone.set_player_turn(self.get_player_turn())
+        return clone
 
 
     def set_player_turn(self, player):
@@ -31,6 +46,8 @@ class InternalDameBoard:
     def get_score(self):
         return self.__score
 
+    def set_score(self, score):
+        self.__score = score
 
     def get_tile(self, row, column):
         return self.__board[row][column]
@@ -113,3 +130,14 @@ class InternalDameBoard:
                 queen = self.get_tile(row, column)
                 if queen is not None:
                     self.__queens.append(queen)
+
+
+    def __get_clone_of_board(self):
+        board_range = range(0, len(self.__board))
+        clone = [[None for columns in board_range] for rows in board_range]
+        for row in board_range:
+            for column in board_range:
+                queen = self.get_tile(row, column)
+                if queen is not None:
+                    clone[row][column] = queen.clone()
+        return clone
