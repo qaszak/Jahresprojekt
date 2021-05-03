@@ -39,7 +39,12 @@ class MovementLogic:
 
     # private methods
     def __is_already_moved_in_turn(self, board, queen):
-        return board.get_in_turn_previously_moved_queen() == queen
+        output = False
+        if board.get_in_turn_previously_moved_queen() is not None:
+            moved_queen = board.get_in_turn_previously_moved_queen()
+            output = (moved_queen.get_row() == queen.get_row()) and \
+                     (moved_queen.get_column() == queen.get_column())
+        return output
 
 
     def __is_new_turn(self, board):
