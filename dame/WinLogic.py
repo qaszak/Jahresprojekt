@@ -12,7 +12,7 @@ class WinLogic:
 
     # public method
     def get_winner(self, board):
-        winner = ""
+        winner = -1
         if self.__is_player_on_opponents_baseline(board, self.__ai_player) or \
            self.__is_player_out_of_queens(board, self.__human_player) or \
            self.__is_player_out_of_moves(board, self.__human_player):
@@ -28,13 +28,13 @@ class WinLogic:
     def __is_player_on_opponents_baseline(self, board, player):
         result = False
         for queen in board.get_queens_for(player):
-            if queen.get_row() == self.__get_opponents_baseline_index(board, player):
+            if queen.get_row() == self.get_opponents_baseline_index(board, player):
                 result = True
                 break
         return result
 
 
-    def __get_opponents_baseline_index(self, board, player):
+    def get_opponents_baseline_index(self, board, player):
         return 0 if player == self.__human_player else board.get_size() - 1
 
 
