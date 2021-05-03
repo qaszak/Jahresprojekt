@@ -1,6 +1,7 @@
 import InternalDameBoard
 import ExternalDameBoard
 import Queen
+import BoardEvaluationLogic
 import MovementLogic
 import WinLogic
 import Move
@@ -9,13 +10,14 @@ import Move
 class DameLogic:
 
     __board = None
+    __evaluation_logic = None
     __movement_logic = None
     __win_logic = None
-
     __BOARD_SIZE = 6
     __AI_PLAYER = 1
     __HUMAN_PLAYER = 2
-    __PLAYER_FIRST_MOVE = 2
+    #__PLAYER_FIRST_MOVE = 2
+    __PLAYER_FIRST_MOVE = 1
     __NAME_AI_PLAYER = "Computer"
     __NAME_HUMAN_PLAYER = "Player"
     __AI_QUEEN_CHARACTER = "B"
@@ -28,6 +30,11 @@ class DameLogic:
                      [__EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER],
                      [__HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER]]
     """
+    __START_BOARD = [[__EMPTY_TILE_CHARACTER, __AI_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER],
+                     [__EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __AI_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER],
+                     [__EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER],
+                     [__HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER]]
+
     __START_BOARD = [[__EMPTY_TILE_CHARACTER, __AI_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER],
                      [__EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __AI_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER],
                      [__EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER],
@@ -56,17 +63,24 @@ class DameLogic:
         return moves
 
 
+    def get_hitting_moves_for_player(self, board, player):
+        return self.__movement_logic.get_hitting_moves_for_player(board, player)
+
+
+    def evaluate_board(self, board, player):
+        return self.__evaluation_logic.evaluate(board, player)
+
+
     def is_game_over(self, board=None):
         if board is None:
             board = self.__board
-        return self.get_winner(board) != ""
+        return self.get_winner(board) != -1
 
 
     def get_winner(self, board=None):
         if board is None:
             board = self.__board
-        winner = self.__win_logic.get_winner(board)
-        return self.__get_player_name(winner)
+        return self.__win_logic.get_winner(board)
 
 
     def get_external_board(self, board=None):
@@ -74,7 +88,7 @@ class DameLogic:
             board = self.__board
         board_representation = board.get_board_representation(self.__EMPTY_TILE_CHARACTER)
         score = board.get_score()
-        name_player_turn = self.__get_player_name(board.get_player_turn())
+        name_player_turn = self.get_player_name(board.get_player_turn())
         character_player_turn = self.__get_player_character(board.get_player_turn())
         number_of_queens_ai = len(board.get_queens_for(self.__AI_PLAYER))
         number_of_queens_human = len(board.get_queens_for(self.__HUMAN_PLAYER))
@@ -107,6 +121,10 @@ class DameLogic:
         return self.__HUMAN_PLAYER if player == self.__AI_PLAYER else self.__AI_PLAYER
 
 
+    def get_opponents_baseline_index(self, board, player):
+        return self.__win_logic.get_opponents_baseline_index(board, player)
+
+
     # private methods
     def __initialize_board(self, board):
         PARSE_BOARD = True
@@ -115,6 +133,7 @@ class DameLogic:
                                                            self.__PLAYER_FIRST_MOVE, self.__AI_PLAYER, self.__HUMAN_PLAYER,
                                                            self.__AI_QUEEN_CHARACTER, self.__HUMAN_QUEEN_CHARACTER,
                                                            self.__EMPTY_TILE_CHARACTER,)
+        self.__evaluation_logic = BoardEvaluationLogic.BoardEvaluationLogic(self)
         self.__movement_logic = MovementLogic.MovementLogic(self.__AI_PLAYER, self.__HUMAN_PLAYER)
         self.__win_logic = WinLogic.WinLogic(self, self.__AI_PLAYER, self.__HUMAN_PLAYER)
 
@@ -127,7 +146,7 @@ class DameLogic:
         return self.__AI_QUEEN_CHARACTER if player == self.__AI_PLAYER else self.__HUMAN_QUEEN_CHARACTER
 
 
-    def __get_player_name(self, player):
+    def get_player_name(self, player):
         output = ""
         if player == self.__AI_PLAYER:
             output = self.__NAME_AI_PLAYER
