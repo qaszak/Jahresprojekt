@@ -1,14 +1,18 @@
 import InternalDameBoard
 import ExternalDameBoard
 import Queen
+import MinimaxTreeNode
 import BoardEvaluationLogic
 import MovementLogic
 import WinLogic
 import Move
+import time
 
 
 class DameLogic:
 
+    __dame = None
+    __difficulty = -1
     __board = None
     __evaluation_logic = None
     __movement_logic = None
@@ -16,33 +20,25 @@ class DameLogic:
     __BOARD_SIZE = 6
     __AI_PLAYER = 1
     __HUMAN_PLAYER = 2
-    #__PLAYER_FIRST_MOVE = 2
-    __PLAYER_FIRST_MOVE = 1
+    __PLAYER_FIRST_MOVE = 2
+    # __PLAYER_FIRST_MOVE = 1
     __NAME_AI_PLAYER = "Computer"
     __NAME_HUMAN_PLAYER = "Player"
     __AI_QUEEN_CHARACTER = "B"
     __HUMAN_QUEEN_CHARACTER = "W"
     __EMPTY_TILE_CHARACTER = " "
+    __DELAY_KI_REACTION_IN_SECONDS = 1
     __START_BOARD = [[__EMPTY_TILE_CHARACTER, __AI_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __AI_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __AI_QUEEN_CHARACTER],
                      [__AI_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __AI_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __AI_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER],
                      [__EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER],
                      [__EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER],
                      [__EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER],
                      [__HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER]]
-    """
-    __START_BOARD = [[__EMPTY_TILE_CHARACTER, __AI_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER],
-                     [__EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __AI_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER],
-                     [__EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER],
-                     [__HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER]]
-
-    __START_BOARD = [[__EMPTY_TILE_CHARACTER, __AI_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER],
-                     [__EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __AI_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER],
-                     [__EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER, __EMPTY_TILE_CHARACTER],
-                     [__HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER, __HUMAN_QUEEN_CHARACTER, __EMPTY_TILE_CHARACTER]]
-    """
 
 
-    def __init__(self):
+    def __init__(self, dame, difficulty):
+        self.__dame = dame
+        self.__difficulty = difficulty
         self.__initialize_board(self.__START_BOARD)
 
 
@@ -98,6 +94,15 @@ class DameLogic:
                                                    self.__HUMAN_QUEEN_CHARACTER, self.__EMPTY_TILE_CHARACTER)
 
 
+    def process_human_move(self, move):
+        self.execute_move(move)
+        self.__dame.send_external_board(self.get_external_board())
+        while self.__board.get_player_turn() == self.__AI_PLAYER:
+            self.__execute_ki_move()
+            time.sleep(self.__DELAY_KI_REACTION_IN_SECONDS)
+            self.__dame.send_external_board(self.get_external_board())
+
+
     def execute_move(self, move, board=None):
         if board is None:
             board = self.__board
@@ -115,6 +120,14 @@ class DameLogic:
             if len(self.__movement_logic.get_moves_for(board, move.get_queen())) == 0:
                 board.close_turn()
                 self.__switch_player_turn(board)
+
+
+    def __execute_ki_move(self):
+        if self.__board.get_player_turn() == self.__AI_PLAYER:
+            minimax = MinimaxTreeNode.MinimaxTreeNode(self, self.__AI_PLAYER, self.__board, None, self.__HUMAN_PLAYER, self.__difficulty)
+            best_ki_move = minimax.get_best_move()
+            best_ki_move = self.__cast_ki_move_to_board(best_ki_move)
+            self.execute_move(best_ki_move)
 
 
     def get_opponent(self, player):
@@ -170,6 +183,13 @@ class DameLogic:
             board.set_player_turn(self.__HUMAN_PLAYER)
         else:
             board.set_player_turn(self.__AI_PLAYER)
+
+
+    def __cast_ki_move_to_board(self, move):
+        queen_ki_board = move.get_queen()
+        queen_original_board = self.__get_queen_at(queen_ki_board.get_row(), queen_ki_board.get_column())
+        return Move.Move(queen_original_board, move.get_row(), move.get_column())
+
 
 
     ################### UNCOMMENT TO RUN TESTCASES.PY #######################

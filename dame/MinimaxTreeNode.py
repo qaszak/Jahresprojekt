@@ -12,7 +12,7 @@ class MinimaxTreeNode:
     __child_nodes = []
 
     # replace player argument with current_board.get_player()?
-    def __init__(self, dame_logic, maximizing_player, board, move, player_turn, current_tree_depth, max_tree_depth):
+    def __init__(self, dame_logic, maximizing_player, board, move, player_turn, max_tree_depth, current_tree_depth=-1):
         self.__dame_logic = dame_logic
         self.__maximizing_player = maximizing_player
         self.__current_board = board.clone()
@@ -23,6 +23,7 @@ class MinimaxTreeNode:
         self.__child_nodes = []
         if self.__current_tree_depth < self.__max_tree_depth:
             self.build_child_nodes()
+        # print("Player turn: " + str(self.__current_board.get_player_turn()))
         # self.test_print()
 
 
@@ -42,7 +43,7 @@ class MinimaxTreeNode:
                     move_clone = move.clone()
                     self.__dame_logic.execute_move(move_clone.clone(), board_clone)
                     child = MinimaxTreeNode(self.__dame_logic, self.__maximizing_player, board_clone, move_clone,
-                                            self.__player_turn, self.__current_tree_depth, self.__max_tree_depth)
+                                            self.__player_turn, self.__max_tree_depth, self.__current_tree_depth)
                     self.__child_nodes.append(child)
 
 
@@ -53,7 +54,6 @@ class MinimaxTreeNode:
 
 
     def evaluate_tree(self):
-        # print(str(self.__current_tree_depth))
         if len(self.__child_nodes) == 0:
             self.__subtree_score = self.__dame_logic.evaluate_board(self.__current_board, self.__maximizing_player)
         else:
@@ -85,7 +85,6 @@ class MinimaxTreeNode:
 
 
     # FOR TESTING
-    """
     def test_print(self):
         if (len(self.__child_nodes) == 0):
             external_board = self.__dame_logic.get_external_board(self.__current_board)
@@ -99,4 +98,3 @@ class MinimaxTreeNode:
         print(str(self.__current_tree_depth) + ": " + str(self.__subtree_score))
         for child in self.__child_nodes:
             child.test_print_scores()
-    """
