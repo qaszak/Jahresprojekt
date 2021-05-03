@@ -5,7 +5,7 @@ class BoardEvaluationLogic:
     def __init__(self, dame_logic):
         self.__dame_logic = dame_logic
 
-
+    # public method
     def evaluate(self, board, player):
         score = 0
         if self.__is_game_won(board, player):
@@ -20,6 +20,7 @@ class BoardEvaluationLogic:
         return score
 
 
+    # private methods
     def __is_game_won(self, board, player):
         return self.__dame_logic.get_winner(board) == player
 
