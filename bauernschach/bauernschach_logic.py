@@ -3,14 +3,21 @@ from random import choice
 from tkinter import *
 from tkinter import messagebox
 
+from dbManagement.database import DB
+
 
 class Bauernschach():
-    def __init__(self, can, B_W, B_S, rand, difficulty):
+    def __init__(self, master, can, B_W, B_S, rand, login, player_stats_id, difficulty, s):
+        self.master = master
         self.difficulty = difficulty
+        self.player_stats_id = player_stats_id
+        self.login = login
         self.EASY = "easy"
         self.NORMAL = "normal"
         self.HARD = "hard"
         self.game_state = None
+        self.LOSE = "lose"
+        self.WIN = "win"
         self.GAME_OVER = "GAME OVER"
         # the highlighted square
         self.highlighted_square = []
@@ -28,15 +35,18 @@ class Bauernschach():
         self.BOARD_WIDTH = B_W
         self.BOARD_SIZE = B_S
         self.rand = rand
+        self.game = "pawnchess"
         self.spiel = "bauernschach"
         self.last_selected = [0, 0]
-        size = 6
+        size = s
         self.player_pawns_position = []
         self.KI_pawns_position = []
         for i in range(size):
             self.player_pawns_position.append([i, size - 1])
             self.KI_pawns_position.append([i, 0])
         print("bauernschach init")
+        b4 = Button(self.master, text='back', command=self.back)
+        self.can.create_window(650, 100, anchor=NW, window=b4)
 
     # draw the pawns on the KI side
     def fill_board_KI_pawns(self):
@@ -66,7 +76,7 @@ class Bauernschach():
 
     def fill_board_pawns(self):
         print("draw pawns")
-        self.difficulty = self.NORMAL
+        # self.difficulty = self.NORMAL
         self.fill_board_player_pawns()
         self.fill_board_KI_pawns()
 
@@ -142,7 +152,7 @@ class Bauernschach():
         line = int(y / self.BOARD_WIDTH)
         self.removeSelectionFromOthers_bauernschach()
         self.last_selected = [col, line]
-        print("selected square ", self.last_selected)
+        # print("selected square ", self.last_selected)
         self.highlighted_square = []
 
         self.can.create_rectangle(col * self.BOARD_WIDTH + self.rand, line * self.BOARD_WIDTH + self.rand,
@@ -150,7 +160,7 @@ class Bauernschach():
                                   (line + 1) * self.BOARD_WIDTH + self.rand,
                                   outline='red')
         self.possible_moves_bauernschach()
-        print("highlited square in selected square ", self.highlighted_square)
+        # print("highlited square in selected square ", self.highlighted_square)
         print("**********************************************************************")
 
     def possible_moves_bauernschach(self):
@@ -160,7 +170,7 @@ class Bauernschach():
 
         # print("last possible moves 1 col   line  ", col, line)
         if self.is_position_free_from_KI_pawns(col, line) == TRUE:
-            print(col, line, " is a possible move")
+            # print(col, line, " is a possible move")
             self.highlighted_square.append([col, line])
             obj1 = self.can.create_rectangle(col * self.BOARD_WIDTH + self.rand, line * self.BOARD_WIDTH + self.rand,
                                              (col + 1) * self.BOARD_WIDTH + self.rand,
@@ -169,7 +179,7 @@ class Bauernschach():
             self.can.tag_bind(obj1, "<Button-1>", self.play_move_bauernschach)
 
         if self.is_position_free_from_KI_pawns(col + 1, line) == FALSE:
-            print(col + 1, line, " is a possible move")
+            # print(col + 1, line, " is a possible move")
             self.highlighted_square.append([col + 1, line])
             obj3 = self.can.create_rectangle((col + 1) * self.BOARD_WIDTH + self.rand,
                                              line * self.BOARD_WIDTH + self.rand,
@@ -179,7 +189,7 @@ class Bauernschach():
             self.can.tag_bind(obj3, "<Button-1>", self.play_move_bauernschach)
 
         if self.is_position_free_from_KI_pawns(col - 1, line) == FALSE:
-            print(col - 1, line, " is a possible move")
+            # print(col - 1, line, " is a possible move")
             self.highlighted_square.append([col - 1, line])
             obj4 = self.can.create_rectangle((col - 1) * self.BOARD_WIDTH + self.rand,
                                              line * self.BOARD_WIDTH + self.rand,
@@ -187,13 +197,12 @@ class Bauernschach():
                                              (line + 1) * self.BOARD_WIDTH + self.rand, fill='#99ff99',
                                              stipple='gray50')
             self.can.tag_bind(obj4, "<Button-1>", self.play_move_bauernschach)
-        print("highlighted square in possible moves: ", self.highlighted_square)
+        # print("highlighted square in possible moves: ", self.highlighted_square)
 
     def show_possible_moves_bauernschach(self, event):
         self.selected_square_bauernschach(event.x, event.y)
 
     def back(self):
-        print("back")
         Bauernschach.back_player(self)
         Bauernschach.back_KI(self)
 
@@ -235,7 +244,7 @@ class Bauernschach():
         self.player_pawns_position[old_x] = [old_x, old_y]
 
     def play_move_bauernschach(self, event):
-        if self.game_state != self.GAME_OVER:
+        if self.game_state == None:
             col = int(event.x / self.BOARD_WIDTH)
             line = int(event.y / self.BOARD_WIDTH)
             # store the played move  [0] ::> old position [1] ::> new position
@@ -250,7 +259,7 @@ class Bauernschach():
             else:
                 c_oval = 'white'
 
-            print("played move player : ", self.played_move_player)
+            # print("played move player : ", self.played_move_player)
             # remove the highlight from the possible square
             self.removeSelectionFromOthers_bauernschach()
             self.draw_rectangle(col, line, c_oval, 0)
@@ -266,7 +275,7 @@ class Bauernschach():
             for x in self.KI_pawns_position:
                 if x == self.played_move_player[1]:
                     self.KI_pawns_position.remove(self.played_move_player[1])
-            print("new KI position ", self.KI_pawns_position)
+            # print("new KI position ", self.KI_pawns_position)
             # initialise the last selected Square
             self.last_selected = [-1, -1]
             line = line + 1
@@ -281,7 +290,8 @@ class Bauernschach():
                 count = count + 1
             if line - 1 == 0:
                 print("**************** YOU WIN ***********************")
-                self.game_state = self.GAME_OVER
+                self.game_state = self.WIN
+                self.set_score()
                 messagebox.showinfo("Basic Example", "YOU WIN")
             else:
                 self.best_move_bauernschach()
@@ -318,7 +328,7 @@ class Bauernschach():
                 player_possible_moves_bauernschach.append([col, line, col - 1, line - 1])
         return player_possible_moves_bauernschach
 
-    def play_possible_move_player_bauernschach(self, KI_pawns_position, player_pawns_position):
+    def possible_moves_player_bauernschach(self, KI_pawns_position, player_pawns_position):
         all_moves = []
         for x in self.player_possible_move_bauernschach(KI_pawns_position, player_pawns_position):
             cur_position = [x[0], x[1]]
@@ -344,7 +354,7 @@ class Bauernschach():
         # print("KI POSSIBLE MOVES ", KI_possible_moves_bauernschach)
         return KI_possible_moves_bauernschach
 
-    def play_possible_move_KI_bauernschach(self, KI_pawns_position, player_pawns_position):
+    def possible_moves_KI_bauernschach(self, KI_pawns_position, player_pawns_position):
         all_moves = []
 
         for x in self.KI_possible_move_bauernschach(KI_pawns_position, player_pawns_position):
@@ -361,20 +371,26 @@ class Bauernschach():
         self.best_move_bauernschach(difficulty)
 
     def evaluate(self, KI_pawns_position, player_pawns_position):
-        # print(" evalute KI POSITION ",KI_pawns_position)
-        # print(" evalute PLAYER POSITION ", player_pawns_position)
+        sum_KI = 0
+        sum_player = 0
+        # print("for THIS POSITION :", sum_KI, sum_player)
+        # print(" KI :    ", KI_pawns_position)
+        # print(" PLAYER :", player_pawns_position)
+        # print("state is:", sum_KI - sum_player)
+        # print("state is 2: ", len(KI_pawns_position) - len(player_pawns_position))
         return len(KI_pawns_position) - len(player_pawns_position)
 
-    def minimax(self, KI_positions, player_positions, depth, state, max_player):
+    def minimax(self, state, KI_positions, player_positions, depth, max_player):
         if depth == 0 or state == self.GAME_OVER:
-            return self.evaluate(KI_positions, player_positions), KI_positions, player_positions, state
+            return self.evaluate(KI_positions, player_positions), state
         if max_player:
             max_eval = -1000
             best_move = None
             ## all possible moves [0]and[1] are the current position [2]and[3] the possible move
-            for move_KI in self.play_possible_move_KI_bauernschach(KI_positions, player_positions):
-                eval = self.minimax(move_KI, player_positions, depth - 1, state,
-                                    FALSE)[0]  ## how do i know the state here???
+            possible_moves = self.possible_moves_KI_bauernschach(KI_positions, player_positions)
+            for move_KI in possible_moves:
+                eval = self.minimax(state, move_KI, player_positions, depth - 1, FALSE)[
+                    0]  ## how do i know the state here???
                 max_eval = max(max_eval, eval)
                 if max_eval == eval:
                     best_move = move_KI
@@ -383,30 +399,37 @@ class Bauernschach():
             min_eval = 1000
             best_move = None
             ## all possible moves [0]and[1] are the current position [2]and[3] the possible move
-            for move_player in self.play_possible_move_player_bauernschach(KI_positions, player_positions):
-                eval = self.minimax(KI_positions, move_player, depth - 1, state,
-                                    TRUE)[0]  ## how do i know the state here???
+            possible_moves = self.possible_moves_player_bauernschach(KI_positions, player_positions)
+            for move_player in possible_moves:
+                eval = self.minimax(state, KI_positions, move_player, depth - 1, TRUE)[
+                    0]  ## how do i know the state here???
                 min_eval = min(min_eval, eval)
                 if min_eval == eval:
                     best_move = move_player
             return min_eval, best_move
 
     def best_move_bauernschach(self):
-        # TODO MiniMax
+        if self.KI_pawns_position == []:
+            self.game_state = self.WIN
+            self.set_score()
+            messagebox.showinfo("Basic Example", "YOU WIN best_move")
+
         KI_positions = deepcopy(self.KI_pawns_position)
         player_positions = deepcopy(self.player_pawns_position)
         state = deepcopy(self.game_state)
         if self.difficulty == self.HARD:
-            depth = 6
+            depth = 8
         elif self.difficulty == self.NORMAL:
             depth = 4
         elif self.difficulty == self.EASY:
             depth = 2
         max_player = TRUE
 
-        KI_possible_moves_bauernschach = self.minimax(KI_positions, player_positions, depth, state, max_player)[1]
+        KI_possible_moves_bauernschach = self.minimax(state, KI_positions, player_positions, depth, max_player)[1]
         copy_ki_pawns_position = deepcopy(self.KI_pawns_position)
-        if KI_possible_moves_bauernschach != []:
+        print(" show ki and player", KI_possible_moves_bauernschach, KI_positions, player_positions)
+
+        if KI_possible_moves_bauernschach != [] and KI_positions != [] and KI_possible_moves_bauernschach is not None:
             for x in self.KI_pawns_position:
                 for y in KI_possible_moves_bauernschach:
                     if x == y:
@@ -420,10 +443,32 @@ class Bauernschach():
             cur_y = copy_ki_pawns_position[0][1]
             # move = choice(KI_possible_moves_bauernschach)
             self.play_KI_move_bauernschach(cur_x, cur_y, next_x, next_y)
-        else:
-            print("********************* YOU LOSE (no possible moves) *************************")
-            self.game_state = self.GAME_OVER
-            messagebox.showinfo("Basic Example", "YOU LOSE")
+        if self.possible_moves_player_bauernschach(self.KI_pawns_position, self.player_pawns_position) == []:
+            self.game_state = self.LOSE
+            self.set_score()
+            messagebox.showinfo("Basic Example", "YOU LOSE NO POSSIBLE MOVES")
+
+    def set_score(self):
+        score = 0
+        if self.game_state == self.LOSE:
+            if self.difficulty == self.EASY:
+                score = -8
+            elif self.difficulty == self.NORMAL:
+                score = -6
+            else:
+                score = -4
+        elif self.game_state == self.WIN:
+            if self.difficulty == self.EASY:
+                score = 2
+            elif self.difficulty == self.NORMAL:
+                score = 4
+            else:
+                score = 8
+        db = DB()
+        db.alter_player_stats(self.player_stats_id, self.game_state)
+        db.set_score(self.login, self.game, score)
+        db.get_pawn_chess_best_list()
+        db.close_con()
 
     def draw_rectangle(self, col, line, color, t):
         self.can.create_rectangle(col * self.BOARD_WIDTH + t + self.rand, line * self.BOARD_WIDTH + t + self.rand,
@@ -471,17 +516,21 @@ class Bauernschach():
         self.KI_pawns_position.remove(self.played_move_KI[0])
         self.KI_pawns_position.append(self.played_move_KI[1])
 
-        print("KI PAWNS POSITION", self.KI_pawns_position)
+        # print("KI PAWNS POSITION", self.KI_pawns_position)
+
         if len(self.KI_pawns_position) == 0:
             print("draw!!!!")
-            self.game_state = self.GAME_OVER
-            messagebox.showinfo("Basic Example", "YOU WIN")
+            self.game_state = self.WIN
+            self.set_score()
+            messagebox.showinfo("Basic Example ", "YOU WIN 1")
         if self.KI_possible_move_bauernschach(self.KI_pawns_position, self.player_pawns_position) == []:
             print("draw!!!!")
-            self.game_state = self.GAME_OVER
-            messagebox.showinfo("Basic Example", "DRAW")
+            self.game_state = self.WIN
+            self.set_score()
+            messagebox.showinfo("Basic Example ", "YOU WIN 2")
         elif self.played_move_KI[1][1] == self.BOARD_SIZE - 1:
             print("******************* YOU LOSE *****************************")
-            self.game_state = self.GAME_OVER
-            messagebox.showinfo("Basic Example", "YOU LOSE")
+            self.game_state = self.LOSE
+            self.set_score()
+            messagebox.showinfo("Basic Example ", "YOU LOSE 3")
         print("*************************************************************")

@@ -48,14 +48,17 @@ class Window:
 
     def play_pawnchess(self, difficulty):
         db = DB()
-        db.add_player_stats(self.login, self.game, self.difficulty)
-        Play_bauernschach(self.window, difficulty)
+        player_stats_id=db.add_player_stats(self.login, self.game, self.difficulty)
+        Play_bauernschach(self.window, self.login, difficulty,player_stats_id)
 
     def register_btn_clicked(self):
         username = self.username_entry.get()
         password = self.password_entry.get()
         db = DB()
-        if db.is_exist_register(username):
+        if username== "" or password== "":
+            self.lbl_result2.config(text="", fg="red")
+
+        elif db.is_exist_register(username):
             self.lbl_result2.config(text=self.USERNAME_ALREADY_EXIST, fg="red")
             # self.create_window_content(self.window, "game_select")
             # self.create_window_content(self.window,"bauernschach")

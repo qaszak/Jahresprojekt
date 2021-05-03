@@ -2,6 +2,7 @@ import sqlite3
 from tkinter import TRUE, FALSE
 import dbManagement
 
+
 class DB:
     def __init__(self):
         self.con = sqlite3.connect("../login/JAHRESPROJEKT.db")
@@ -78,21 +79,41 @@ class DB:
         self.cursor.execute("INSERT INTO PLAYER_STATS (GAME,DIFFICULTY,USER_ID,CANCELED) VALUES(?,?,?,1)",
                             (game, difficulty, id))
         self.con.commit()
+        return self.cursor.lastrowid
+
+    def alter_player_stats(self, player_stats_id, state):
+        if state == "win":
+            self.cursor.execute("UPDATE PLAYER_STATS SET CANCELED = 0 , WIN= 1 WHERE ID_PLAYER_STATS  = ?",
+                                (player_stats_id,))
+        else:
+            self.cursor.execute("UPDATE PLAYER_STATS SET CANCELED = 0 , LOSE= 1 WHERE ID_PLAYER_STATS  = ?",
+                                (player_stats_id,))
+        self.con.commit()
+
+    # TODO player stats win quote and number of games
+
+    def get_player_stats(self, login):
+        id = self.find_user(login)
+        if id == 0:
+            raise Exception("USER NOT FOUND !!")
+        self.cursor.execute("SELECT * FROM PLAYER_STATS WHERE USER_ID=?", (id,))
+        rows = self.cursor.fetchall()
+        return rows
 
     def get_dame_best_list(self):
-        sql = "SELECT * FROM DAME_BEST_LIST"
+        sql = "SELECT * FROM DAME_BEST_LIST ORDER BY SCORE DESC"
         self.cursor.execute(sql)
         rows = self.cursor.fetchall()
         return rows
 
     def get_pawn_chess_best_list(self):
-        sql = "SELECT * FROM PAWN_CHESS_BEST_LIST"
+        sql = "SELECT * FROM PAWN_CHESS_BEST_LIST ORDER BY SCORE DESC"
         self.cursor.execute(sql)
         rows = self.cursor.fetchall()
         return rows
 
     def get_tic_tac_toe_best_list(self):
-        sql = "SELECT * FROM TIC_TAC_TOE_BEST_LIST"
+        sql = "SELECT * FROM TIC_TAC_TOE_BEST_LIST ORDER BY SCORE DESC"
         self.cursor.execute(sql)
         rows = self.cursor.fetchall()
         return rows
@@ -106,7 +127,6 @@ class DB:
             return self.get_tic_tac_toe_best_list()
 
     def add_best_list(self, login):
-        print("asdasdasda  ", login)
         self.add_pawn_chess_best_list(login)
         self.add_dame_best_list(login)
         self.add_tic_tac_toe_best_list(login)
@@ -209,19 +229,19 @@ class DB:
 
 db = DB()
 # db.add_user("zak", "123")
-#rows = db.all_users()
-#for row in rows:
- #   print(row)
-
+# rows = db.all_users()
+# for row in rows:
+#   print(row)
+#db.add_player_stats("zak", "pawnchess", "hard")
 # db.add_player_stats("zak","pawnchess","hard")
 
-#rows = db.all_player_stats()
-#for row in rows:
- #   print(row)
+# rows = db.all_player_stats()
+# for row in rows:
+#   print(row)
 # db.add_best_list("zak")
-#db.set_score("zak", "dame", 10)
+db.set_score("zak", "pawnchess", 10)
 
-print("best_list_dame ", db.get_best_list("dame"))
+print("best_list_dame ", db.get_player_stats(""))
 print("best_list_pawn ", db.get_best_list("pawnchess"))
-print("best_list_tic ", db.get_best_list("tic-tac-toe"))
-#print(db.find_user("zak"))
+# print("best_list_tic ", db.get_best_list("tic-tac-toe"))
+# print(db.find_user("zak"))
