@@ -610,52 +610,6 @@ class Window:
 
         self.window.mainloop()
 
-    # def create_blank_window(self):
-    #     window = Tk()
-    #     window.geometry(f"{self.WINDOW_WIDTH}x{self.WINDOW_HEIGHT}")
-    #     window.title(self.WINDOW_TITLE)
-    #     window.configure(background=self.WINDOW_COLOR)
-    #
-    #     l = Label(window, text="LEADER BOARD")
-    #     l.config(font=("Courier", 14))
-    #
-    #     b = Text(window, height=2, width=10)
-    #     b.grid(row=1, column=1)
-    #     b.insert(END, "-----")
-    #     text = "NAME"
-    #     b = Text(window, height=2, width=10)
-    #     b.grid(row=1, column=2)
-    #     b.insert(END, text)
-    #     text = "SCORE"
-    #     b = Text(window, height=2, width=10)
-    #     b.grid(row=1, column=3)
-    #     b.insert(END, text)
-    #     i = 1
-    #     db = DB()
-    #     rows = []
-    #     if self.game == self.PAWN_CHESS:
-    #         rows = db.get_pawn_chess_best_list()
-    #     if self.game == self.DAME:
-    #         rows = db.get_dame_best_list()
-    #     if self.game == self.TIC_TAC_TAE:
-    #         rows = db.get_tic_tac_toe_best_list()
-    #     print(rows)
-    #     for row in rows:
-    #         b = Text(window, height=5, width=10)
-    #         b.grid(row=i + 1, column=1)
-    #         b.insert(END, "player")
-    #         text = row[1]
-    #         b = Text(window, height=5, width=10)
-    #         b.grid(row=i + 1, column=2)
-    #         b.insert(END, text)
-    #         text = row[7]
-    #         b = Text(window, height=5, width=10)
-    #         b.grid(row=i + 1, column=3)
-    #         b.insert(END, text)
-    #         i = i + 1
-    #     db.close_con()
-    #     window.mainloop()
-
     def change_content_type(self, window, content_type):
         self.delete_widgets(self.window)
         self.create_window_content(self.window, content_type)
