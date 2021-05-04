@@ -1,5 +1,4 @@
 from copy import deepcopy
-from random import choice
 from tkinter import *
 from tkinter import messagebox
 
@@ -7,7 +6,7 @@ from dbManagement.database import DB
 
 
 class Bauernschach():
-    def __init__(self, can, B_W, B_S, rand, login, difficulty, id_player_stat):
+    def __init__(self, master, can, B_W, B_S, rand, login, difficulty, id_player_stat):
         self.difficulty = difficulty
         self.id_player_stat = id_player_stat
         self.login = login
@@ -44,6 +43,8 @@ class Bauernschach():
             self.player_pawns_position.append([i, size - 1])
             self.KI_pawns_position.append([i, 0])
         print("bauernschach init")
+        #button1 = Button(master, text="Back", command=self.back(), anchor=W)
+        #button1_window = can.create_window(300, 550, anchor=NW, window=button1)
 
     # draw the pawns on the KI side
     def fill_board_KI_pawns(self):

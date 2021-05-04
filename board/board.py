@@ -31,7 +31,7 @@ class Board:
         self.can = self.background()
         # b1 = Button(self.master, text='Play now', command=self.board)
         # b1.pack(side=RIGHT, padx=3, pady=3)
-        self.board(login, difficulty, id_player_stat)
+        self.board(self.master, self.can, login, difficulty, id_player_stat)
         # bauern = Bauernschach(self.can, self.BOARD_WIDTH, self.BOARD_SIZE, self.rand)
         # bauernschach_logic=Bauernschach(self.can,self.BOARD_WIDTH,self.BOARD_SIZE,self.rand,difficulty)
 
@@ -83,9 +83,9 @@ class Board:
         return window_background
 
     # create an empty board
-    def board(self, login, difficulty, id_player_stat):
+    def board(self, master, can, login, difficulty, id_player_stat):
         ite, i = 0, 1
-
+        self.can = can
         while self.x1 < self.BOARD_WIDTH * self.BOARD_SIZE and self.y1 < self.BOARD_WIDTH * self.BOARD_SIZE:
             self.can.create_rectangle(self.x1, self.y1, self.x2, self.y2, fill=self.color)
             i, ite, self.x1, self.x2 = i + 1, ite + 1, self.x1 + self.BOARD_WIDTH, self.x2 + self.BOARD_WIDTH
@@ -98,8 +98,8 @@ class Board:
                 self.color = self.COLOR1
 
         if self.spiel == "bauernschach":
-            bauernschach = Bauernschach(self.can, self.BOARD_WIDTH, self.BOARD_SIZE, self.rand, login, difficulty,
-                                        id_player_stat)
+            bauernschach = Bauernschach(master, can, self.BOARD_WIDTH, self.BOARD_SIZE, self.rand, login,
+                                        difficulty,id_player_stat)
             bauernschach.fill_board_pawns()
         elif self.spiel == "dame":
             dame = Dame(self.can, self.BOARD_WIDTH, self.BOARD_SIZE, self.rand)

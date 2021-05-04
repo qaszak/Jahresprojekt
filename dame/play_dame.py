@@ -1,12 +1,11 @@
 from board.board import Board, Tk
 
 
-class Test2():
-    def __init__(self, master):
+class Play_dame():
+    def __init__(self, page, login, difficulty, id_player_stat):
         spiel = "dame"
-        Board(master, spiel)
+        self.master = page
+        # self.master.pack_forget()
+        Board(page, spiel,login, difficulty, id_player_stat)
 
 
-
-page = Tk()
-Test2(page)

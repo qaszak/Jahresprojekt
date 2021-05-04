@@ -90,10 +90,10 @@ class DB:
 
     def alter_player_stats(self, id, state):
         if state == "win":
-            self.cursor.execute("UPDATE PLAYER_STATS SET WIN = 1, CANCELED = 0 WHERE USER_ID=? ",
+            self.cursor.execute("UPDATE PLAYER_STATS SET WIN = 1, CANCELED = 0 WHERE ID_PLAYER_STATS=? ",
                                 (id,))
         elif state == "lose":
-            self.cursor.execute("UPDATE PLAYER_STATS SET LOSE = 1, CANCELED = 0 WHERE USER_ID=? ",
+            self.cursor.execute("UPDATE PLAYER_STATS SET LOSE = 1, CANCELED = 0 WHERE ID_PLAYER_STATS=? ",
                                 (id,))
         self.con.commit()
 
@@ -236,9 +236,34 @@ class DB:
     def close_con(self):
         self.con.close()
 
+    def get_win_games(self, login):
+        self.cursor.execute("SELECT COUNT(*) FROM PLAYER_STATS WHERE LOGIN=? AND WIN=1", (login,))
+        row = self.cursor.fetchone()
+        return row[0]
+
+    def get_total_games(self, login):
+        self.cursor.execute("SELECT COUNT(*) FROM PLAYER_STATS WHERE LOGIN=? ", (login,))
+        row = self.cursor.fetchone()
+        return row[0]
+
+    def get_lose_games(self, login):
+        self.cursor.execute("SELECT COUNT(*) FROM PLAYER_STATS WHERE LOGIN=? AND LOSE=1", (login,))
+        row = self.cursor.fetchone()
+        return row[0]
+
+    def get_canceled_games(self, login):
+        self.cursor.execute("SELECT COUNT(*) FROM PLAYER_STATS WHERE LOGIN=? AND CANCELED=1", (login,))
+        row = self.cursor.fetchone()
+        return row[0]
+
+    def get_score(self, login):
+        self.cursor.execute("SELECT * FROM PAWN_CHESS_BEST_LIST WHERE LOGIN=?", (login,))
+        row = self.cursor.fetchone()
+        return row[7]
+
 
 db = DB()
-# db.add_user("zak", "123")
+#db.add_user("zak", "123")
 # rows = db.all_users()
 # for row in rows:
 #    print(row)
@@ -248,18 +273,18 @@ db = DB()
 # rows = db.all_player_stats()
 # for row in rows:
 #   print(row)
-#db.add_best_list("zak")
-#db.set_score("", "pawnchess", 2)
-# id = db.add_player_stats("zak", "pawnchess", "easy")
-#rows = db.get_pawn_chess_best_list()
-#for row in rows:
+# db.add_best_list("zak")
+# db.set_score("", "pawnchess", 2)
+#id = db.add_player_stats("zak", "pawnchess", "easy")
+# rows = db.get_pawn_chess_best_list()
+# for row in rows:
 #  print(row)
 
-# db.alter_player_stats(id, 1)
+#db.alter_player_stats(id, "lose")
 
-# rows = db.get_player_stats("zak")
-# for row in rows:
-#    print(row)
+rows = db.get_player_stats("zak")
+for row in rows:
+    print(row)
 # print("best_list_dame ", db.get_best_list("dame2"))
 # print("best_list_pawn ", db.get_best_list("pawnchess"))
 # print("best_list_tic ", db.get_best_list("tic-tac-toe"))
