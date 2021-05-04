@@ -435,7 +435,7 @@ class Window:
                                         text=leaderboard_button_text, font='sans 16 bold',
                                         activebackground=leaderboard_button_active_color,
                                         activeforeground=leaderboard_button_font_active_color,
-                                        command=self.leaderboard)
+                                        command=lambda: self.change_content_type(window, "leaderboard"))
             select_label = Label(text="Wähle einen Schwierigkeitsgrad", bg=background_color_secondary,
                                  fg="#ffffff", font='sans 24 bold')
             credit_label = Label(text="© Jahresprojekt 2021 - FA11 - Gruppe 3",
@@ -462,6 +462,144 @@ class Window:
         if content_type == "leaderboard":
             print(content_type)
 
+            ### Leaderboard Screen Content
+
+            ### Params
+
+            background_color_primary = "#96bfd6"
+            background_color_secondary = "#3f6d8c"
+
+            back_button_color = "#858585"
+            back_button_active_color = "#5e5e5e"
+            back_button_font_color = "#ffffff"
+            back_button_font_active_color = "#dddddd"
+            back_button_width = 3
+            back_button_height = 0
+            back_button_text = "⬅"
+
+            window_width = 800
+            window_height = 600
+
+            background_square_primary_color = "#96bfd6"
+            background_square_secondary_color = "#87b0c7"
+            background_square_size = 16
+
+            ### Widgets
+            window_background = Canvas(window, width=800, height=600, bg=background_color_primary)
+
+            # Checkerboard Pattern for Background
+            for i in range(0, window_width, background_square_size):
+                for j in range(0, window_height, background_square_size):
+                    if (i / background_square_size) % 2 == 0:
+                        if (j / background_square_size) % 2 == 0:
+                            window_background.create_rectangle(i, j, i+background_square_size, j+background_square_size, fill=background_square_primary_color, outline=background_square_primary_color)
+                        else:
+                            window_background.create_rectangle(i, j, i+background_square_size, j+background_square_size, fill=background_square_secondary_color, outline=background_square_secondary_color)
+                    else:
+                        if (j / background_square_size) % 2 == 0:
+                            window_background.create_rectangle(i, j, i+background_square_size, j+background_square_size, fill=background_square_secondary_color, outline=background_square_secondary_color)
+                        else:
+                            window_background.create_rectangle(i, j, i+background_square_size, j+background_square_size, fill=background_square_primary_color, outline=background_square_primary_color)
+
+            window_background.create_rectangle(70, 32, 730, 568, fill=background_color_secondary)
+
+            back_button = Button(window, bg=back_button_color, fg=back_button_font_color, width=back_button_width, height=back_button_height, text=back_button_text, font='sans 16 bold', activebackground=back_button_active_color, activeforeground=back_button_font_active_color, command=lambda: self.change_content_type(window, "game_settings"))
+            title_label = Label(text="Bestenlisten", bg=background_color_secondary, fg="#ffffff", font='sans 24 bold')
+            credit_label = Label(text="© Jahresprojekt 2021 - FA11 - Gruppe 3", bg=background_color_primary, fg="#ffffff", font='sans 12')
+            player_listbox = Listbox(height=15, width=24, font='sans 14 bold', bg="#2d4d63", fg="#ffffff")
+            playcount_listbox = Listbox(height=15, width=4, font='sans 14 bold', bg="#2d4d63", fg="#ffffff")
+            win_listbox = Listbox(height=15, width=4, font='sans 14 bold', bg="#2d4d63", fg="#ffffff")
+            draw_listbox = Listbox(height=15, width=4, font='sans 14 bold', bg="#2d4d63", fg="#ffffff")
+            lose_listbox = Listbox(height=15, width=4, font='sans 14 bold', bg="#2d4d63", fg="#ffffff")
+            cancelled_listbox = Listbox(height=15, width=4, font='sans 14 bold', bg="#2d4d63", fg="#ffffff")
+            score_listbox = Listbox(height=15, width=8, font='sans 14 bold', bg="#2d4d63", fg="#ffffff")
+            player_label = Label(text="Name", bg=background_color_secondary, fg="#ffffff", font='sans 12 bold')
+            playcount_label = Label(text="G", bg=background_color_secondary, fg="#ffffff", font='sans 12 bold')
+            win_label = Label(text="W", bg=background_color_secondary, fg="#ffffff", font='sans 12 bold')
+            draw_label = Label(text="D", bg=background_color_secondary, fg="#ffffff", font='sans 12 bold')
+            lose_label = Label(text="L", bg=background_color_secondary, fg="#ffffff", font='sans 12 bold')
+            cancelled_label = Label(text="X", bg=background_color_secondary, fg="#ffffff", font='sans 12 bold')
+            score_label = Label(text="Punkte", bg=background_color_secondary, fg="#ffffff", font='sans 12 bold')
+
+            ### Logic
+
+            db = DB()
+            rows = []
+
+            if self.game == self.PAWN_CHESS:
+                rows = db.get_pawn_chess_best_list()
+            if self.game == self.DAME:
+                rows = db.get_dame_best_list()
+            if self.game == self.TIC_TAC_TAE:
+                rows = db.get_tic_tac_toe_best_list()
+
+            db.close_con()
+
+            player_list = []
+            playcount_list = []
+            win_list = []
+            draw_list = []
+            lose_list = []
+            cancelled_list = []
+            score_list = []
+
+            for i in range(len(rows)):
+                # Get Usernames in High Score List
+                player_list.append(rows[i][1])
+                # Get Play Count in High Score List
+                playcount_list.append(rows[i][2])
+                # Get Wins in High Score List
+                win_list.append(rows[i][3])
+                # Get Draws in High Score List
+                draw_list.append(rows[i][4])
+                # Get Loses in High Score List
+                lose_list.append(rows[i][5])
+                # Get Cancelleds in High Score List
+                cancelled_list.append(rows[i][6])
+                # Get Score in High Score List
+                score_list.append(rows[i][7])
+
+            reversed_player_list = player_list[::-1]
+            reversed_playcount_list = playcount_list[::-1]
+            reversed_win_list = win_list[::-1]
+            reversed_draw_list = draw_list[::-1]
+            reversed_lose_list = lose_list[::-1]
+            reversed_cancelled_list = cancelled_list[::-1]
+            reversed_score_list = score_list[::-1]
+
+            for i in range(len(reversed_player_list)):
+                player_listbox.insert(0, f"{reversed_player_list[i]}")
+                playcount_listbox.insert(0, f"{reversed_playcount_list[i]}")
+                win_listbox.insert(0, f"{reversed_win_list[i]}")
+                draw_listbox.insert(0, f"{reversed_draw_list[i]}")
+                lose_listbox.insert(0, f"{reversed_lose_list[i]}")
+                cancelled_listbox.insert(0, f"{reversed_cancelled_list[i]}")
+                score_listbox.insert(0, f"{reversed_score_list[i]}")
+
+            # Placement
+
+            credit_label.place(x=245, y=572)
+            window_background.place(x=0, y=0)
+            title_label.place(x=301, y=50)
+
+            player_listbox.place(x=96, y=135)
+            playcount_listbox.place(x=366, y=135)
+            win_listbox.place(x=416, y=135)
+            draw_listbox.place(x=466, y=135)
+            lose_listbox.place(x=516, y=135)
+            cancelled_listbox.place(x=566, y=135)
+            score_listbox.place(x=616, y=135)
+
+            back_button.place(x=660, y=505)
+
+            player_label.place(x=92, y=110)
+            playcount_label.place(x=380, y=110)
+            win_label.place(x=430, y=110)
+            draw_label.place(x=480, y=110)
+            lose_label.place(x=530, y=110)
+            cancelled_label.place(x=580, y=110)
+            score_label.place(x=630, y=110)
+
     def create_window(self, content_type):
         self.window = Tk()
         self.window.geometry(f"{self.WINDOW_WIDTH}x{self.WINDOW_HEIGHT}")
@@ -472,51 +610,51 @@ class Window:
 
         self.window.mainloop()
 
-    def create_blank_window(self):
-        window = Tk()
-        window.geometry(f"{self.WINDOW_WIDTH}x{self.WINDOW_HEIGHT}")
-        window.title(self.WINDOW_TITLE)
-        window.configure(background=self.WINDOW_COLOR)
-
-        l = Label(window, text="LEADER BOARD")
-        l.config(font=("Courier", 14))
-
-        b = Text(window, height=2, width=10)
-        b.grid(row=1, column=1)
-        b.insert(END, "-----")
-        text = "NAME"
-        b = Text(window, height=2, width=10)
-        b.grid(row=1, column=2)
-        b.insert(END, text)
-        text = "SCORE"
-        b = Text(window, height=2, width=10)
-        b.grid(row=1, column=3)
-        b.insert(END, text)
-        i = 1
-        db = DB()
-        rows = []
-        if self.game == self.PAWN_CHESS:
-            rows = db.get_pawn_chess_best_list()
-        if self.game == self.DAME:
-            rows = db.get_dame_best_list()
-        if self.game == self.TIC_TAC_TAE:
-            rows = db.get_tic_tac_toe_best_list()
-        print(rows)
-        for row in rows:
-            b = Text(window, height=5, width=10)
-            b.grid(row=i + 1, column=1)
-            b.insert(END, "player")
-            text = row[1]
-            b = Text(window, height=5, width=10)
-            b.grid(row=i + 1, column=2)
-            b.insert(END, text)
-            text = row[7]
-            b = Text(window, height=5, width=10)
-            b.grid(row=i + 1, column=3)
-            b.insert(END, text)
-            i = i + 1
-        db.close_con()
-        window.mainloop()
+    # def create_blank_window(self):
+    #     window = Tk()
+    #     window.geometry(f"{self.WINDOW_WIDTH}x{self.WINDOW_HEIGHT}")
+    #     window.title(self.WINDOW_TITLE)
+    #     window.configure(background=self.WINDOW_COLOR)
+    #
+    #     l = Label(window, text="LEADER BOARD")
+    #     l.config(font=("Courier", 14))
+    #
+    #     b = Text(window, height=2, width=10)
+    #     b.grid(row=1, column=1)
+    #     b.insert(END, "-----")
+    #     text = "NAME"
+    #     b = Text(window, height=2, width=10)
+    #     b.grid(row=1, column=2)
+    #     b.insert(END, text)
+    #     text = "SCORE"
+    #     b = Text(window, height=2, width=10)
+    #     b.grid(row=1, column=3)
+    #     b.insert(END, text)
+    #     i = 1
+    #     db = DB()
+    #     rows = []
+    #     if self.game == self.PAWN_CHESS:
+    #         rows = db.get_pawn_chess_best_list()
+    #     if self.game == self.DAME:
+    #         rows = db.get_dame_best_list()
+    #     if self.game == self.TIC_TAC_TAE:
+    #         rows = db.get_tic_tac_toe_best_list()
+    #     print(rows)
+    #     for row in rows:
+    #         b = Text(window, height=5, width=10)
+    #         b.grid(row=i + 1, column=1)
+    #         b.insert(END, "player")
+    #         text = row[1]
+    #         b = Text(window, height=5, width=10)
+    #         b.grid(row=i + 1, column=2)
+    #         b.insert(END, text)
+    #         text = row[7]
+    #         b = Text(window, height=5, width=10)
+    #         b.grid(row=i + 1, column=3)
+    #         b.insert(END, text)
+    #         i = i + 1
+    #     db.close_con()
+    #     window.mainloop()
 
     def change_content_type(self, window, content_type):
         self.delete_widgets(self.window)
