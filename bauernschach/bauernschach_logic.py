@@ -6,7 +6,7 @@ from dbManagement.database import DB
 
 
 class Bauernschach():
-    def __init__(self, master, can, B_W, B_S, rand, login, difficulty, id_player_stat):
+    def __init__(self, master, can, B_W, B_S, rand, login, difficulty, id_player_stat,size):
         self.difficulty = difficulty
         self.id_player_stat = id_player_stat
         self.login = login
@@ -36,15 +36,15 @@ class Bauernschach():
         self.spiel = "bauernschach"
         self.game = "pawnchess"
         self.last_selected = [0, 0]
-        size = 6
+        self.size = 16
         self.player_pawns_position = []
         self.KI_pawns_position = []
         for i in range(size):
             self.player_pawns_position.append([i, size - 1])
             self.KI_pawns_position.append([i, 0])
         print("bauernschach init")
-        #button1 = Button(master, text="Back", command=self.back(), anchor=W)
-        #button1_window = can.create_window(300, 550, anchor=NW, window=button1)
+        # button1 = Button(master, text="Back", command=self.back(), anchor=W)
+        # button1_window = can.create_window(300, 550, anchor=NW, window=button1)
 
     # draw the pawns on the KI side
     def fill_board_KI_pawns(self):
@@ -173,7 +173,7 @@ class Bauernschach():
             self.highlighted_square.append([col, line])
             obj1 = self.can.create_rectangle(col * self.BOARD_WIDTH + self.rand, line * self.BOARD_WIDTH + self.rand,
                                              (col + 1) * self.BOARD_WIDTH + self.rand,
-                                             (line + 1) * self.BOARD_WIDTH + self.rand, fill='#99ff99',
+                                             (line + 1) * self.BOARD_WIDTH + self.rand, fill='green',
                                              stipple='gray50')
             self.can.tag_bind(obj1, "<Button-1>", self.play_move_bauernschach)
 
@@ -356,9 +356,9 @@ class Bauernschach():
         # print("KI POSSIBLE MOVES ", KI_possible_moves_bauernschach)
         return KI_possible_moves_bauernschach
 
+    #
     def possible_moves_KI_bauernschach(self, KI_pawns_position, player_pawns_position):
         all_moves = []
-
         for x in self.KI_possible_move_bauernschach(KI_pawns_position, player_pawns_position):
             KI_position = deepcopy(KI_pawns_position)
             cur_position = [x[0], x[1]]
@@ -372,21 +372,24 @@ class Bauernschach():
     def KI_move_bauernschach(self, difficulty):
         self.best_move_bauernschach(difficulty)
 
-    def evaluate(self, KI_pawns_position, player_pawns_position):
-        sum_KI = 0
-        sum_player = 0
-        # print("for THIS POSITION :", sum_KI, sum_player)
-        # print(" KI :    ", KI_pawns_position)
-        # print(" PLAYER :", player_pawns_position)
-        # print("state is:", sum_KI - sum_player)
-        # print("state is 2: ", len(KI_pawns_position) - len(player_pawns_position))
+    def evaluate(self, KI_pawns_position, player_pawns_position, max_player):
+        if max_player:
+            for x in KI_pawns_position:
+                if x[0] == 0:
+                    state = self.GAME_OVER
+                    return -1000
+        else:
+            for x in player_pawns_position:
+                if x[0] == self.BOARD_SIZE - 1:
+                    state = self.GAME_OVER
+                    return 1000
         return len(KI_pawns_position) - len(player_pawns_position)
 
     def minimax(self, state, KI_positions, player_positions, depth, max_player):
         if depth == 0 or state == self.GAME_OVER:
-            return self.evaluate(KI_positions, player_positions), KI_positions, player_positions
+            return self.evaluate(KI_positions, player_positions, max_player), KI_positions, player_positions
         if max_player:
-            max_eval = -1000
+            max_eval = -10000
             best_move = None
             ## all possible moves [0]and[1] are the current position [2]and[3] the possible move
             possible_moves = self.possible_moves_KI_bauernschach(KI_positions, player_positions)
@@ -397,7 +400,7 @@ class Bauernschach():
                     best_move = move_KI
             return max_eval, best_move
         else:
-            min_eval = 1000
+            min_eval = 10000
             best_move = None
             ## all possible moves [0]and[1] are the current position [2]and[3] the possible move
             possible_moves = self.possible_moves_player_bauernschach(KI_positions, player_positions)

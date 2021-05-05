@@ -5,7 +5,7 @@ import dbManagement
 
 class DB:
     def __init__(self):
-        self.con = sqlite3.connect("../login/JAHRESPROJEKT.db")
+        self.con = sqlite3.connect("../pages/JAHRESPROJEKT.db")
         self.cursor = self.con.cursor()
         sql = "CREATE TABLE IF NOT EXISTS USER(" \
               "ID_USER INTEGER PRIMARY KEY AUTOINCREMENT," \
@@ -282,9 +282,9 @@ db = DB()
 
 #db.alter_player_stats(id, "lose")
 
-rows = db.get_player_stats("zak")
-for row in rows:
-    print(row)
+#rows = db.get_player_stats("zak")
+#for row in rows:
+# print(row)
 # print("best_list_dame ", db.get_best_list("dame2"))
 # print("best_list_pawn ", db.get_best_list("pawnchess"))
 # print("best_list_tic ", db.get_best_list("tic-tac-toe"))

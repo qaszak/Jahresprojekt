@@ -2,6 +2,7 @@ from tkinter import *
 
 ###
 from bauernschach.play_bauernschach import Play_bauernschach
+from dame.play_dame import Play_dame
 from dbManagement.database import DB
 
 

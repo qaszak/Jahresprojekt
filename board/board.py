@@ -99,7 +99,7 @@ class Board:
 
         if self.spiel == "bauernschach":
             bauernschach = Bauernschach(master, can, self.BOARD_WIDTH, self.BOARD_SIZE, self.rand, login,
-                                        difficulty,id_player_stat)
+                                        difficulty,id_player_stat,self.BOARD_SIZE)
             bauernschach.fill_board_pawns()
         elif self.spiel == "dame":
             dame = Dame(self.can, self.BOARD_WIDTH, self.BOARD_SIZE, self.rand)
